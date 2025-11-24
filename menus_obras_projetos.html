@@ -1,0 +1,2253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Árvore de Menus TOTVS RM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f3f4f6;
+      color: #111827;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-bar {
+      background: #0C6C94;
+      color: #fff;
+      width: 100%;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .page-wrapper {
+      flex: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 20px auto 80px auto;
+      padding: 0 12px;
+    }
+
+    .subtitle {
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(15,23,42,0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e5e7eb;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      font-size: 0.8rem;
+      color: #374151;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+
+    .btn-pill:hover {
+      background: #eef2ff;
+      box-shadow: 0 1px 4px rgba(15,23,42,0.18);
+      transform: translateY(-1px);
+    }
+
+    .tree-container {
+      padding: 16px 20px;
+      font-size: 0.9rem;
+      max-height: calc(100vh - 210px);
+      overflow: auto;
+      scrollbar-width: thin;
+    }
+
+    .tree-container ul {
+      list-style: none;
+      margin-left: 22px;
+    }
+
+    .tree-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 0;
+    }
+
+    .toggle-arrow {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      color: #4b5563;
+    }
+
+    .arrow-icon {
+      width: 14px;
+      height: 14px;
+      display: block;
+      transition: transform 0.18s ease;
+    }
+
+    .collapsed > ul {
+      display: none;
+    }
+
+    .menu-checkbox {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1px solid #9ca3af;
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+      background: #ffffff;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .menu-checkbox:checked {
+      background: #0C6C94;
+      border-color: #0C6C94;
+      box-shadow: 0 0 0 2px rgba(12,108,148,0.25);
+    }
+
+    .menu-checkbox:checked::after {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 1px;
+      width: 4px;
+      height: 8px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+
+    .footer-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(243,244,246,0.95);
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: center;
+      padding: 8px 12px;
+      backdrop-filter: blur(6px);
+    }
+
+    .footer-buttons {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .footer-buttons button {
+      padding: 9px 20px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+
+    .btn-primary {
+      background: #0C6C94;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-bar">Selecione as permissões do módulo</div>
+
+  <main class="page-wrapper">
+    <p class="subtitle">Marque os menus desejados para este perfil.</p>
+    <p class="hint">Dica: clique na seta para expandir/recolher os níveis da árvore.</p>
+
+    <section class="card">
+      <header class="card-header">
+        <div class="card-title">Árvore de menus TOTVS RM</div>
+        <div class="card-actions">
+          <button class="btn-pill" onclick="expandirTodos(true)">▾ Expandir tudo</button>
+          <button class="btn-pill" onclick="expandirTodos(false)">▸ Recolher tudo</button>
+        </div>
+      </header>
+
+      <div id="tree" class="tree-container"></div>
+    </section>
+  </main>
+
+  <div class="footer-bar">
+    <div class="footer-buttons">
+      <button class="btn-secondary" onclick="marcarTodos(false)">Desmarcar todos</button>
+      <button class="btn-primary" onclick="marcarTodos(true)">Marcar todos</button>
+      <button class="btn-primary" onclick="exportarHTML()">Exportar HTML</button>
+    </div>
+  </div>
+
+
+  <script type="text/plain" id="raw-menus">
+[01] Projeto
+   [01.01] Básico
+        [01.01.01] Selecionar Projeto
+            [01.01.01.01] Inserir novo Projeto
+            [01.01.01.02] Remover Projeto
+            [01.01.01.03] Editar Projeto
+            [01.01.01.04] Gerar revisão de projeto
+            [01.01.01.05] Alterar hierarquia de projetos
+            [01.01.01.06] Inserir histórico de projetos
+            [01.01.01.07] Gerar revisão múltipla de projeto
+            [01.01.01.08] Transformar fase de projeto
+            [01.01.01.09] Aplicar Alteração de Escopo
+            [01.01.01.10] Listar projetos que o usuário não possui acesso
+            [01.01.01.11] Projetos de Revisão Múltipla
+            [01.01.01.12] Processo de Separação de BDI
+            [01.01.01.13] Sincronismo de Projetos de Revisão Múltipla
+            [01.01.01.14] Fluxo de Aprovação FLUIG
+            [01.01.01.15] Cancelar Workflow Fluig
+            [01.01.01.16] Acesso Rápido a Projetos
+            [01.01.01.17] Permitir alterar histórico de projeto revisado
+            [01.01.01.18] Histórico de valores do cálculo do projeto
+            [01.01.01.19] Histórico de valores do cálculo do projeto - Tarefa
+        [01.01.02] Calcular Projeto
+        [01.01.03] Consistência de Projetos
+        [01.01.04] Resumo do Projeto
+        [01.01.05] Monitor de Obras
+        [01.01.06] Cockpit de Tarefas / Insumos
+ 
+    [01.02] Utilitários
+        [01.02.01] Comparador de Projetos
+            [01.02.01.01] Planilha de Atividades
+                [01.02.01.01.01] Cronograma Previsto
+            [01.02.01.02] Planilha de Serviços
+                [01.02.01.02.01] Cronograma Previsto
+            [01.02.01.03] Composições
+            [01.02.01.04] Insumos
+            [01.02.01.05] Parâmetros
+            [01.02.01.06] Cenários
+        [01.02.08] Log de Usuário
+            [01.02.08.01] Excluir Log de Usuarios
+        [01.02.09] Importações
+            [01.02.09.01] Importar Grupo de Custo via Excel
+            [01.02.09.02] Importar Insumos via Excel
+            [01.02.09.03] Importar Composições via Excel
+            [01.02.09.04] Importar Tarefas via Excel
+            [01.02.09.05] Importar Apropriação de Serviço/Insumo via Excel
+            [01.02.09.06] Importar Calendário de Atividades via Excel
+            [01.02.09.07] Importar Insumos/Composições/Tarefa via arquivo texto
+                [01.02.09.07.01] Importar Insumos via arquivo texto
+                [01.02.09.07.02] Importar Composições via arquivo texto
+                [01.02.09.07.03] Importar Tarefas via arquivo texto
+                [01.02.09.07.04] Importar Cliente/Fornecedor via arquivo texto
+            [01.02.09.08] Importar Arquivos EMOP
+                [01.02.09.08.01] Importar Insumos via EMOP
+                [01.02.09.08.02] Importar Composições via EMOP
+                [01.02.09.08.03] Importar Preços via EMOP
+            [01.02.09.09] Importar Arquivos FGV
+                [01.02.09.09.01] Importar Insumos via FGV
+                [01.02.09.09.02] Importar Composições via FGV
+                [01.02.09.09.03] Importar Preços via FGV
+            [01.02.09.10] Integrar com Base ORCECERTO
+            [01.02.09.11] Importar Insumo de Suprimento/Faturamento
+            [01.02.09.12] Exportar Insumo para Suprimento/Faturamento
+            [01.02.09.13] Importar Tarefas via MS Project
+        [01.02.23] Acerto de Inconsistências
+            [01.02.23.01] Ajuste de hierarquia de tarefas
+            [01.02.23.02] Ajuste de Grupo DNIT
+            [01.02.23.03] Ajuste de histórico de contratos
+            [01.02.23.04] Ajuste de medições de contratos
+            [01.02.23.05] Atualização de De/Para de Tarefas EAI 2
+            [01.02.23.06] Ajuste de periodicidade do contrato
+            [01.02.23.07] Identificação de consultas sql de apropriação de tarefas
+            [01.02.23.08] Verificação de objetos gerenciais impactados pelo novo SICRO
+
+        [01.02.32] Backup e Restauração
+            [01.02.32.01] Backup do projeto
+                [01.02.32.01.01] Agendar Backup do Projeto
+            [01.02.32.02] Restaurar Projeto
+
+    [01.03] Parâmetros
+        [01.03.01] TOTVS Construção Obras e Projetos
+            [01.03.01.01] Gerais
+                [01.03.01.01.01] Editar Parâmetros Gerais
+            [01.03.01.02] Projetos
+                [01.03.01.02.01] Cálculo
+                [01.03.01.02.02] Exibição
+                [01.03.01.02.03] Casas Decimais
+                [01.03.01.02.04] Cronograma
+                [01.03.01.02.05] Campos Livres
+                [01.03.01.02.06] Log
+                [01.03.01.02.07] Pert / alocaçõa de Recurso
+                [01.03.01.02.08] Insumos
+                [01.03.01.02.09] Contratos
+                [01.03.01.02.10] Apropriação
+                [01.03.01.02.11] Gestão de Risco
+                [01.03.01.02.12] Integração
+                [01.03.01.02.13] Planilha de Serviço
+                [01.03.01.02.14] Planilha de Atividade
+                [01.03.01.02.15] Projeto
+                [01.03.01.02.16] Composições
+                [01.03.01.02.17] Mobilidade
+                [01.03.01.02.18] Timesheet
+            [01.03.01.03] Funções de Acesso Inicial a Projetos
+            [01.03.01.04] Exibir Valores da Barra de Cálculo
+
+        [01.03.06] Aceleradores de Implantação
+            [01.03.06.01] Base ORCECERTO
+            [01.03.06.02] App Minha Obra
+            [01.03.06.03] Check-list do Portal de Medição do Fornecedor
+            [01.03.06.04] Estruturação de Condições para Cadastramento de Funcionários
+
+        [01.03.11] Globais
+
+        [01.03.12] Integrações
+            [01.03.12.01] Incluir Integrações de Sistemas
+            [01.03.12.02] Excluir Integrações de Sistemas
+            [01.03.12.03] Editar Integrações de Sistemas
+
+[02] Cad. Gerais
+    [02.01] Básicos
+        [02.01.01] Unidades
+            [02.01.01.01] Incluir Unidade
+            [02.01.01.02] Excluir Unidade
+            [02.01.01.03] Editar Unidade
+
+        [02.01.02] Modelos de Taxa
+            [02.01.02.01] Incluir Modelo de Taxa
+            [02.01.02.02] Excluir Modelo de Taxa
+            [02.01.02.03] Editar Modelo de Taxa
+
+        [02.01.03] Campos Complementares
+            [02.01.03.01] Projeto
+            [02.01.03.02] Obra
+            [02.01.03.03] Tarefas
+            [02.01.03.04] Contrato
+            [02.01.03.05] Medição
+            [02.01.03.06] Insumos
+            [02.01.03.07] Composições
+            [02.01.03.08] Apropriação de Insumos
+            [02.01.03.09] Aditivos de Contrato
+            [02.01.03.10] Grupo de Custo
+            [02.01.03.11] Pedidos (Movimento Backoffice)
+            [02.01.03.12] Folha Tarefa
+            [02.01.03.13] Apontamentos de Ciclo de Transporte
+            [02.01.03.14] Apontamentos de Equipamentos
+            [02.01.03.15] Histórico de Apontamentos de Avanço Físico
+            [02.01.03.16] Apontamentos de Mão de Obra
+
+        [02.01.20] Moedas e Índices
+        [02.01.21] Cotações
+        [02.01.22] Bancos e Agências
+        [02.01.23] Filiais
+        [02.01.24] Países
+        [02.01.25] Departamentos
+        [02.01.26] Estados
+
+        [02.01.27] Calendários
+            [02.01.27.01] Incluir Calendários e Feriados
+            [02.01.27.02] Excluir Calendários e Feriados
+            [02.01.27.03] Editar Calendários e Feriados
+
+        [02.01.28] Motivo de Improdutividade
+            [02.01.28.01] Inserir Motivos Prod/Improd
+            [02.01.28.02] Excluir Motivos Prod/Improd
+            [02.01.28.03] Editar Motivos Prod/Improd
+
+        [02.01.29] Unidade de Serviço
+            [02.01.29.01] Incluir Unidade de Serviço
+            [02.01.29.02] Excluir Unidade de Serviço
+            [02.01.29.03] Alterar Unidade de Serviço
+            [02.01.29.04] Local de Serviço
+            [02.01.29.05] Incluir Local de Serviço
+            [02.01.29.06] Excluir Local de Serviço
+            [02.01.29.07] Alterar Local de Serviço
+            [02.01.29.08] Copiar Local de Serviço
+
+    [02.02] Tabelas Auxiliares
+
+        [02.02.01] Condição de Pagamento
+            [02.02.01.01] Incluir Condição de Pagamento
+            [02.02.01.02] Excluir Condição de Pagamento
+            [02.02.01.03] Editar Condição de Pagamento
+
+        [02.02.02] Clientes/Fornecedores
+            [02.02.02.01] Inserir novo Cliente/Fornecedor
+            [02.02.02.02] Excluir Cliente/Fornecedor
+            [02.02.02.03] Editar Cliente/Fornecedor
+            [02.02.02.04] Alteração Global de cliente/fornecedor
+            [02.02.02.05] Imprimir relatório simplificado de Cliente/Fornecedor
+            [02.02.02.06] Acessar Cliente
+            [02.02.02.07] Acessar Fornecedor
+            [02.02.02.08] Envio de e-mail para Cliente/Fornecedor
+            [02.02.02.09] Incluir Filtro de Cliente/Fornecedor
+            [02.02.02.10] Editar Filtro de Cliente/Fornecedor
+            [02.02.02.11] Excluir Filtro de Cliente/Fornecedor
+            [02.02.02.12] Exportar visão para arquivo CSV
+            [02.02.02.13] Inserir Contato do Cliente/Fornecedor
+            [02.02.02.14] Excluir Contato do Cliente/Fornecedor
+            [02.02.02.15] Editar Contato do Cliente/Fornecedor
+            [02.02.02.16] Usuários Vinculados (Portal TCOP)
+
+        [02.02.03] Produto
+            [02.02.03.01] Inserir Produtos
+            [02.02.03.02] Remover Produtos
+            [02.02.03.03] Alterar Produtos
+            [02.02.03.04] Alterar filtros produtos
+            [02.02.03.05] Excluir filtros produtos
+            [02.02.03.06] Incluir filtros produtos
+            [02.02.03.07] Filtro RM Factor
+            [02.02.03.08] Visualizar Lote
+            [02.02.03.09] Inserir Lote
+            [02.02.03.10] Remover Lote
+            [02.02.03.11] Alterar Lote
+            [02.02.03.12] Aplicar Cliente/fornecedor
+            [02.02.03.13] Comissão Funcionário
+            [02.02.03.14] Vincula Produto a EPI do RM Vitae
+
+        [02.02.04] Pessoas
+            [02.02.04.01] Inserir uma Pessoa
+            [02.02.04.02] Excluir uma Pessoa
+            [02.02.04.03] Editar uma Pessoa
+            [02.02.04.04] Enviar e-mail
+            [02.02.04.05] Visualizar rel. dados pessoais
+            [02.02.04.06] Documentos: Visualizar
+            [02.02.04.07] Documentos: Alterar
+            [02.02.04.08] Aplicar filtro
+            [02.02.04.09] Gráficos: Visualizar
+            [02.02.04.10] Gráficos: Alterar
+            [02.02.04.11] Gráficos: Excluir
+            [02.02.04.12] Gráficos: Incluir
+            [02.02.04.13] Identificação: Visualizar
+            [02.02.04.14] Identificação: Alterar
+            [02.02.04.15] Identificação: Visualizar Informações Adicionais
+            [02.02.04.16] Identificação: Alterar Informações Adicionais
+            [02.02.04.17] Identificação: Visualizar Endereço Principal
+            [02.02.04.18] Identificação: Alterar Endereço Principal
+            [02.02.04.19] Identificação: Visualizar Histórico de Endereço
+            [02.02.04.20] Identificação: Alterar Histórico de Endereço
+            [02.02.04.21] Identificação: Excluir Histórico de Endereço
+            [02.02.04.22] Identificação: Incluir Histórico de Endereço
+            [02.02.04.23] Identificação: Visualizar Endereço Complementar
+            [02.02.04.24] Identificação: Alterar Endereço Complementar
+            [02.02.04.25] Identificação: Excluir Endereço Complementar
+            [02.02.04.26] Identificação: Incluir Endereço Complementar
+            [02.02.04.27] Incluir pessoa como candidato
+
+  [01.03] Parâmetros
+        [01.03.01] TOTVS Construção Obras e Projetos
+            [01.03.01.01] Gerais
+                [01.03.01.01.01] Editar Parâmetros Gerais
+            [01.03.01.02] Projetos
+                [01.03.01.02.01] Cálculo
+                [01.03.01.02.02] Exibição
+                [01.03.01.02.03] Casas Decimais
+                [01.03.01.02.04] Cronograma
+                [01.03.01.02.05] Campos Livres
+                [01.03.01.02.06] Log
+                [01.03.01.02.07] Pert / alocaçõa de Recurso
+                [01.03.01.02.08] Insumos
+                [01.03.01.02.09] Contratos
+                [01.03.01.02.11] Gestão de Risco
+                [01.03.01.02.12] Integração
+                [01.03.01.02.13] Planilha de Serviço
+                [01.03.01.02.14] Planilha de Atividade
+                [01.03.01.02.15] Projeto
+                [01.03.01.02.16] Composições
+                [01.03.01.02.17] Mobilidade
+                [01.03.01.02.18] Timesheet
+            [01.03.01.03] Funções de Acesso Inicial a Projetos
+            [01.03.01.04] Exibir Valores da Barra de Cálculo
+        [01.03.06] Aceleradores de Implantação
+            [01.03.06.01] Base ORCECERTO
+            [01.03.06.02] App Minha Obra
+            [01.03.06.03] Check-list do Portal de Medição do Fornecedor
+            [01.03.06.04] Estruturação de Condições para Cadastramento de Funcionários
+        [01.03.11] Globais
+        [01.03.12] Integrações
+            [01.03.12.01] Incluir Integrações de Sistemas
+            [01.03.12.02] Excluir Integrações de Sistemas
+            [01.03.12.03] Editar Integrações de Sistemas
+
+[02] Cad. Gerais
+    [02.01] Básicos
+        [02.01.01] Unidades
+            [02.01.01.01] Incluir Unidade
+            [02.01.01.02] Excluir Unidade
+            [02.01.01.03] Editar Unidade
+        [02.01.02] Modelos de Taxa
+            [02.01.02.01] Incluir Modelo de Taxa
+            [02.01.02.02] Excluir Modelo de Taxa
+            [02.01.02.03] Editar Modelo de Taxa
+        [02.01.03] Campos Complementares
+            [02.01.03.01] Projeto
+            [02.01.03.02] Obra
+            [02.01.03.03] Tarefas
+            [02.01.03.04] Contrato
+            [02.01.03.05] Medição
+            [02.01.03.06] Insumos
+            [02.01.03.07] Composições
+            [02.01.03.08] Apropriação de Insumos
+            [02.01.03.09] Aditivos de Contrato
+            [02.01.03.10] Grupo de Custo
+            [02.01.03.11] Pedidos (Movimento Backoffice)
+            [02.01.03.12] Folha Tarefa
+            [02.01.03.13] Apontamentos de Ciclo de Transporte
+            [02.01.03.14] Apontamentos de Equipamentos
+            [02.01.03.15] Histórico de Apontamentos de Avanço Físico
+            [02.01.03.16] Apontamentos de Mão de Obra
+        [02.01.20] Moedas e Índices
+        [02.01.21] Cotações
+        [02.01.22] Bancos e Agências
+        [02.01.23] Filiais
+        [02.01.24] Países
+        [02.01.25] Departamentos
+        [02.01.26] Estados
+        [02.01.27] Calendários
+            [02.01.27.01] Incluir Calendários e Feriados
+            [02.01.27.02] Excluir Calendários e Feriados
+            [02.01.27.03] Editar Calendários e Feriados
+        [02.01.28] Motivo de Improdutividade
+            [02.01.28.01] Inserir Motivos Prod/Improd
+            [02.01.28.02] Excluir Motivos Prod/Improd
+            [02.01.28.03] Editar Motivos Prod/Improd
+        [02.01.29] Unidade de Serviço
+            [02.01.29.01] Incluir Unidade de Serviço
+            [02.01.29.02] Excluir Unidade de Serviço
+            [02.01.29.03] Alterar Unidade de Serviço
+            [02.01.29.04] Local de Serviço
+            [02.01.29.05] Incluir Local de Serviço
+            [02.01.29.06] Excluir Local de Serviço
+            [02.01.29.07] Alterar Local de Serviço
+            [02.01.29.08] Copiar Local de Serviço
+
+    [02.02] Tabelas Auxiliares
+        [02.02.01] Condição de Pagamento
+            [02.02.01.01] Incluir Condição de Pagamento
+            [02.02.01.02] Excluir Condição de Pagamento
+            [02.02.01.03] Editar Condição de Pagamento
+        [02.02.02] Clientes/Fornecedores
+            [02.02.02.01] Inserir novo Cliente/Fornecedor
+            [02.02.02.02] Excluir Cliente/Fornecedor
+            [02.02.02.03] Editar Cliente/Fornecedor
+            [02.02.02.04] Alteração Global de cliente/fornecedor
+            [02.02.02.05] Imprimir relatório simplificado de Cliente/Fornecedor
+            [02.02.02.06] Acessar Cliente
+            [02.02.02.07] Acessar Fornecedor
+            [02.02.02.08] Envio de e-mail para Cliente/Fornecedor
+            [02.02.02.09] Incluir Filtro de Cliente/Fornecedor
+            [02.02.02.10] Editar Filtro de Cliente/Fornecedor
+            [02.02.02.11] Excluir Filtro de Cliente/Fornecedor
+            [02.02.02.12] Exportar visão para arquivo no formato CSV
+            [02.02.02.13] Inserir Contato do Cliente/Fornecedor
+            [02.02.02.14] Excluir Contato do Cliente/Fornecedor
+            [02.02.02.15] Editar Contato do Cliente/Fornecedor
+            [02.02.02.16] Usuários Vinculados (Portal de Medição do Fornecedor - TCOP)
+        [02.02.03] Produto
+            [02.02.03.01] Inserir Produtos
+            [02.02.03.02] Remover Produtos
+            [02.02.03.03] Alterar Produtos
+            [02.02.03.04] Alterar filtros produtos
+            [02.02.03.05] Excluir filtros produtos
+            [02.02.03.06] Incluir filtros produtos
+            [02.02.03.07] Filtro RM Factor
+            [02.02.03.08] Visualizar Lote
+            [02.02.03.09] Inserir Lote
+            [02.02.03.10] Remover Lote
+            [02.02.03.11] Alterar Lote
+            [02.02.03.12] Aplicar Cliente/fornecedor
+            [02.02.03.13] Comissão Funcionário
+            [02.02.03.14] Vincula Produto a EPI do RM Vitae
+        [02.02.04] Pessoas
+            [02.02.04.01] Inserir uma Pessoa
+            [02.02.04.02] Excluir uma Pessoa
+            [02.02.04.03] Editar uma Pessoa
+            [02.02.04.04] Enviar e-mail
+            [02.02.04.05] Visualizar rel. dados pessoais
+            [02.02.04.06] Documentos: Visualizar
+            [02.02.04.07] Documentos: Alterar
+            [02.02.04.08] Aplicar filtro
+            [02.02.04.09] Gráficos: Visualizar
+            [02.02.04.10] Gráficos: Alterar
+            [02.02.04.11] Gráficos: Excluir
+            [02.02.04.12] Gráficos: Incluir
+            [02.02.04.13] Identificação: Visualizar
+            [02.02.04.14] Identificação: Alterar
+            [02.02.04.15] Identificação: Visualizar Informações Adicionais
+            [02.02.04.16] Identificação: Alterar Informações Adicionais
+            [02.02.04.17] Identificação: Visualizar Endereço Principal
+            [02.02.04.18] Identificação: Alterar Endereço Principal
+            [02.02.04.19] Identificação: Visualizar Histórico de Endereço
+            [02.02.04.20] Identificação: Alterar Histórico de Endereço
+            [02.02.04.21] Identificação: Excluir Histórico de Endereço
+            [02.02.04.22] Identificação: Incluir Histórico de Endereço
+            [02.02.04.23] Identificação: Visualizar Endereço Complementar
+            [02.02.04.24] Identificação: Alterar Endereço Complementar
+            [02.02.04.25] Identificação: Excluir Endereço Complementar
+            [02.02.04.26] Identificação: Incluir Endereço Complementar
+            [02.02.04.27] Incluir pessoa como candidato
+        [02.02.05] Terceiros
+            [02.02.05.01] Incluir Terceiro
+            [02.02.05.02] Excluir Terceiro
+            [02.02.05.03] Editar Terceiro
+        [02.02.06] Funções
+            [02.02.06.01] Funções: Inserir
+            [02.02.06.02] Funções: Excluir
+            [02.02.06.03] Funções: Editar
+            [02.02.06.04] Filtro de Funções: Inserir
+            [02.02.06.05] Filtro de Funções: Editar
+            [02.02.06.06] Filtro de Funções: Excluir
+        [02.02.07] Funcionários
+        [02.02.08] Patrimônio
+            [02.02.08.01] Patrimônio - Incluir
+            [02.02.08.02] Patrimônio - Excluir
+            [02.02.08.03] Patrimônio - Editar
+        [02.02.09] Grupo de Patrimônio
+            [02.02.09.01] Grupos - Incluir
+            [02.02.09.02] Grupos - Excluir
+            [02.02.09.03] Grupos - Editar
+        [02.02.10] Funções de Pessoas
+
+    [02.03] Contábeis
+        [02.03.01] Centros de Custos
+        [02.03.02] Classificação de Centros de Custo
+
+    [02.04] Serviços Globais
+        [02.04.01] Coligadas
+        [02.04.02] Tabelas Dinâmicas
+        [02.04.03] Fórmulas
+        [02.04.04] Códigos de Acesso
+        [02.04.05] Perfis
+            [02.04.05.01] Inserir Novo Perfil
+            [02.04.05.02] Remover Perfil
+            [02.04.05.03] Editar Perfil
+            [02.04.05.04] Permissões de Segurança para o Wizard de Parametrização
+        [02.04.06] Usuários
+        [02.04.07] Permissões de Acesso
+        [02.04.08] Administrativa
+            [02.04.08.01] Actions do Sistema
+            [02.04.08.02] Actions Anexas
+            [02.04.08.03] Preferências de Anexos
+            [02.04.08.04] Cadastro de RMParts
+            [02.04.08.05] Servidores de Aplicação
+            [02.04.08.06] Gerenciamento de Alias
+            [02.04.08.07] Conexões a Bancos de Dados externos
+
+[03] Orçamento
+    [03.01] Cadastros
+        [03.01.01] Planilha
+            [03.01.01.01] Planilha de Serviços
+                [03.01.01.01.01] Inserir serviços
+                [03.01.01.01.02] Excluir serviços
+                [03.01.01.01.03] Editar serviços
+                [03.01.01.01.04] Ativar e desativar serviços
+                [03.01.01.01.05] Trocar código dos serviços
+                [03.01.01.01.06] Reorganizar código dos serviços
+                [03.01.01.01.07] Associar serviços
+                [03.01.01.01.08] Cópia de serviços e etapas
+                [03.01.01.01.09] Alterar nome e descrição dos serviços
+                [03.01.01.01.10] Transformar etapa em serviço
+                [03.01.01.01.11] Transformar serviço em etapa
+                [03.01.01.01.12] Memória de cálculo da tarefa durante o projeto
+                [03.01.01.01.13] Informações Complementares do Serviço
+                [03.01.01.01.14] Remover vínculo Serviço/Atividade
+                [03.01.01.01.15] Copiar Cronograma
+                [03.01.01.01.16] Exportar planilha Excel
+                [03.01.01.01.17] Preencher Cronograma da Planilha de Serviços
+                [03.01.01.01.18] Associar Recursos às Tarefas
+                [03.01.01.01.19] Criar Planilha de Atividades a partir de Serviços
+            [03.01.01.02] Planilha de Atividades
+                [03.01.01.02.01] TimeSheet
+                    [03.01.01.02.01.01] Alocação de Recursos
+                    [03.01.01.02.01.02] Incluir Alocação
+                    [03.01.01.02.01.03] Excluir Alocação
+                    [03.01.01.02.01.04] Alterar Alocação
+                    [03.01.01.02.01.05] Executar/Parar Tarefa de TimeSheet
+                [03.01.01.02.02] Inserir atividades
+                [03.01.01.02.03] Excluir atividades
+                [03.01.01.02.04] Editar atividades
+                [03.01.01.02.05] Ativar e desativar atividade
+                [03.01.01.02.06] Trocar código da atividade
+                [03.01.01.02.07] Reorganizar código da atividade
+                [03.01.01.02.08] Associar atividades
+                [03.01.01.02.09] Cópia de atividades e etapas
+                [03.01.01.02.10] Alterar nome e descrição das atividades
+                [03.01.01.02.11] Transformar etapa em atividade
+                [03.01.01.02.12] Transformar atividade em etapa
+                [03.01.01.02.13] Memória de cálculo da tarefa durante o projeto
+                [03.01.01.02.14] Copiar linha base
+                [03.01.01.02.15] Anexo rateio de centro de custo
+                [03.01.01.02.16] Anexo de departamento
+                [03.01.01.02.17] Exportar planilha para Excel
+                [03.01.01.02.18] Detalhes dos Recursos
+                [03.01.01.02.19] Lançar cronograma automaticamente
+                [03.01.01.02.20] Replanejar Cronograma
+                [03.01.01.02.21] Desfaz conversão de item de permanência em preço unitário
+                [03.01.01.02.22] Conversão de item de permanência em preço unitário
+                [03.01.01.02.23] Copiar Cronograma
+                [03.01.01.02.24] Remover vínculo Serviço/Atividade
+                [03.01.01.02.25] Importar Cronograma via Excel
+                [03.01.01.02.26] Calcular Avanço Físico
+                [03.01.01.02.27] Importar Apropriações das Tarefas no BackOffice
+                [03.01.01.02.28] Desmembrar Tarefas
+                [03.01.01.02.29] Recurso da Tarefa
+                [03.01.01.02.30] Associar Recursos às Tarefas
+                [03.01.01.02.31] Calcular Peso
+
+            [03.01.01.04] Cenário 1
+                [03.01.01.04.01] Planilha de Serviços
+                    [03.01.01.04.01.01] Inserir serviços
+                    [03.01.01.04.01.02] Excluir serviços
+                    [03.01.01.04.01.03] Editar serviços
+                    [03.01.01.04.01.04] Ativar e desativar serviços
+                    [03.01.01.04.01.05] Trocar código do serviço
+                    [03.01.01.04.01.06] Reorganizar código dos serviços
+                    [03.01.01.04.01.07] Associar serviços
+                    [03.01.01.04.01.08] Copiar serviços e etapas
+                    [03.01.01.04.01.09] Alterar nome e descrição dos serviços
+                    [03.01.01.04.01.10] Transformar etapa em serviço
+                    [03.01.01.04.01.11] Transformar serviço em etapa
+                    [03.01.01.04.01.12] Memória de cálculo do serviço durante o projeto
+                    [03.01.01.04.01.13] Informações complementares do serviço
+                    [03.01.01.04.01.14] Remover vínculo serviço/atividade
+                    [03.01.01.04.01.15] Copiar cronograma
+                    [03.01.01.04.01.16] Preencher Cronograma da Planilha de Serviços
+
+                [03.01.01.04.02] Planilha de Atividades
+                    [03.01.01.04.02.01] Inserir tarefas
+                    [03.01.01.04.02.02] Excluir serviços
+                    [03.01.01.04.02.03] Editar serviços
+                    [03.01.01.04.02.04] Ativar e desativar serviços
+                    [03.01.01.04.02.05] Trocar código dos serviços
+                    [03.01.01.04.02.06] Reorganizar código dos serviços
+                    [03.01.01.04.02.07] Associar serviços
+                    [03.01.01.04.02.08] Cópia de serviços e etapas
+                    [03.01.01.04.02.09] Alterar nome e descrição dos serviços
+                    [03.01.01.04.02.10] Transformar etapa em serviços
+                    [03.01.01.04.02.11] Transformar serviço em etapa
+                    [03.01.01.04.02.12] Memória de cálculo da tarefa durante o projeto
+                    [03.01.01.04.02.13] Informações Complementares do Serviço
+                    [03.01.01.04.02.14] Transformar cenário na planilha de atividades
+                    [03.01.01.04.02.15] Remover vínculo serviço/atividade
+                    [03.01.01.04.02.16] Exportar planilha para Excel
+                    [03.01.01.04.02.17] Lançar cronograma automaticamente
+                    [03.01.01.04.02.18] Copiar Cronograma
+
+                [03.01.01.04.03] Editar Cenários
+                [03.01.01.04.04] Transformar Cenário Atividade
+
+            [03.01.01.07] Linha
+                [03.01.01.07.01] Inserir tarefas através do botão linha
+
+            [03.01.01.08] Calendário de Atividade
+
+        [03.01.07] Disciplinas
+            [03.01.07.01] Incluir Disciplina
+            [03.01.07.02] Excluir Disciplina
+            [03.01.07.03] Editar Disciplina
+            [03.01.07.04] Associação por Disciplina
+            [03.01.07.05] Associação por Usuário
+            [03.01.07.06] Usuários Associados
+
+            [03.01.08] Grupos de Custo
+                [03.01.08.01] Incluir Grupo de Custo
+                [03.01.08.02] Excluir Grupo de Custo
+                [03.01.08.03] Editar Grupo de Custo
+
+            [03.01.09] Insumos
+                [03.01.09.01] Cadastro
+                    [03.01.09.01.01] Inserir Insumo
+                    [03.01.09.01.02] Excluir Insumo
+                    [03.01.09.01.03] Editar Insumo
+                    [03.01.09.01.04] Equalização
+                    [03.01.09.01.05] Cálculo da Equalização
+                    [03.01.09.01.06] Vincular famílias de produtos a insumos
+                    [03.01.09.01.07] Preço de Insumo
+                    [03.01.09.01.08] Calcular o preço de todos os insumos apresentados
+                    [03.01.09.01.09] Especializar insumo
+                    [03.01.09.01.10] Inserir Preço no Insumo
+                    [03.01.09.01.11] Editar Preço de Insumo
+                    [03.01.09.01.12] Excluir Preço de Insumo
+                    [03.01.09.01.13] Calcular Preço Médio de Insumos
+                    [03.01.09.01.14] Importar Preços de Suprimento/Faturamento
+
+                [03.01.09.02] Alteração Geral
+                [03.01.09.03] Cotação
+                [03.01.09.04] Excluir Insumos Não Utilizados
+                [03.01.09.05] Cálculo Custo Horário
+
+            [03.01.15] Composições
+                [03.01.15.01] Cadastro
+                    [03.01.15.01.01] Inserir Composição
+                    [03.01.15.01.02] Excluir Composição
+                    [03.01.15.01.03] Editar Composição
+                    [03.01.15.01.04] Inserir recurso
+                    [03.01.15.01.05] Excluir recurso
+                    [03.01.15.01.06] Ativar/Desativar recurso
+                    [03.01.15.01.07] Recursos da Composição
+                        [03.01.15.01.07.01] Recursos Vinculados
+                            [03.01.15.01.07.01.01] Incluir Recurso Vinculado
+                            [03.01.15.01.07.01.02] Excluir Recurso Vinculado
+                            [03.01.15.01.07.01.03] Alterar Recurso Vinculado
+                    [03.01.15.01.08] Associar Recursos
+                    [03.01.15.01.09] Impactos em Composição
+                    [03.01.15.01.10] Editar recurso
+                    [03.01.15.01.11] Relatório de modelo fixo excel
+                    [03.01.15.01.12] Processo de Replanejamento de Índices
+                    [03.01.15.01.13] Recursos Consolidados
+                    [03.01.15.01.14] Habilitar/Desabilitar Edição de Composições Replanejadas
+
+            [03.01.15.02] Variáveis
+                [03.01.15.02.01] Incluir Variáveis
+                [03.01.15.02.02] Excluir Variáveis
+                [03.01.15.02.03] Editar Variáveis
+
+            [03.01.15.03] Fórmulas de produtividade
+                [03.01.15.03.01] Inserir fórmula de produtividade
+                [03.01.15.03.02] Excluir fórmula de produtividade
+                [03.01.15.03.03] Editar fórmula de produtividade
+                [03.01.15.03.04] Unidades para fórmula de produtividade
+
+        [03.01.15.04] Alteração Geral
+        [03.01.15.05] Excluir Composições Não Utilizadas
+
+    [03.02] Quadro de Permanência
+
+    [03.03] Cópia de Itens
+        [03.03.01] Executar cópia de Obras
+        [03.03.02] Executar cópia de Serviços
+        [03.03.03] Executar cópia de Composições
+        [03.03.04] Executar cópia de Insumos
+        [03.03.05] Executar cópia de Grupos de Custo
+        [03.03.06] Executar cópia de Parâmetros
+        [03.03.07] Executar cópia de Modelo de Taxas
+        [03.03.08] Executar cópia de Curvas de Distribuição
+        [03.03.09] Executar cópia de Equipes de Projeto
+        [03.03.10] Executar cópia de Disciplinas
+        [03.03.11] Executar cópia de Cenários
+        [03.03.12] Cópia Simplificada
+        [03.03.13] Cópia por Planilha
+        [03.03.14] Executar cópia de Unidades
+
+    [03.04] Alterações
+        [03.04.01] Alterar BDI Diferenciado
+        [03.04.02] Definir Total
+        [03.04.03] Transformar Recursos Globais em Locais
+
+
+[04] BIM
+    [04.01] Modelos 3D
+        [04.01.01] Modelos do Projeto
+            [04.01.01.01] Inserir
+            [04.01.01.02] Excluir 
+            [04.01.01.03] Editar
+            [04.01.01.04] Upload 
+            [04.01.01.05] Download
+            [04.01.01.06] Compartilhar entre projetos 
+            [04.01.01.07] Duplicar 
+            [04.01.01.08] Associação automática de tarefas com os objetos 3D
+            [04.01.01.09] Excluir associações de objetos 3D com as tarefas 
+            [04.01.01.10] Geração de EAP
+            [04.01.01.11] Filtro de Entidades 
+    [04.02] Linha do Tempo
+        [04.02.01] Tipo de tarefa
+            [04.02.01.01] Inserir
+            [04.02.01.02] Excluir
+            [04.02.01.03] Editar
+        [04.02.02] Aparência do objeto 3D
+            [04.02.02.01] Inserir
+            [04.02.02.02] Excluir
+            [04.02.02.03] Editar
+    [04.03] Visualização 3D
+        [04.03.01] Visualização do modelo 3D
+            [04.03.01.01] Apropriação
+    [04.04] Template de Criação de EAP
+        [04.04.01] Template de Criação de EAP
+        [04.04.01.01] Inserir
+        [04.04.01.02] Excluir
+        [04.04.01.03] Editar
+        [04.04.01.04] Níveis da EAP
+        [04.04.01.05] Template de Criação de Tarefas
+        [04.04.01.06] Copiar template
+        [04.04.01.07] Exportar template
+        [04.04.01.08] Importar template
+        [04.04.01.09] Gerar template a partir do(s) modelo(s)
+        [04.04.01.10] Agrupar templates
+ 
+[05] Planejamento
+    [05.01] Cronograma
+        [05.01.01] Curva de Distribuição
+            [05.01.01.01] Incluir Curva de Distribuição
+            [05.01.01.02] Excluir Curva de Distribuição
+            [05.01.01.03] Editar Curva de Distribuição
+            [05.01.01.04] Períodos da Curva de Distribuição
+            [05.01.01.05] Duplicar Curva de Distribuição
+            [05.01.01.06] Tornar Curva de Distribuição Global
+            [05.01.01.07] Apagar Curva de Distribuição Global
+            [05.01.01.08] Aplicar Curva de Distribuição
+            [05.01.01.09] Criar Curvas Default
+        [05.01.02] Cronograma
+            [05.01.02.01] Alterar Cronograma
+            [05.01.02.02] Gerar Lançamento no Fluxus
+            [05.01.02.03] Visualizar valor no cronograma
+            [05.01.02.04] Conversor de Lançamentos Percentuais
+            [05.01.02.05] Efetuar Lançamentos Múltiplos
+        [05.01.03] Cronograma Planilha
+            [05.01.03.01] Planilha de Serviços
+            [05.01.03.02] Planilha de Atividades
+            [05.01.03.03] Cenários
+                [05.01.03.03.01] Planilha de Serviços
+                [05.01.03.03.02] Planilha de Atividades
+
+    [05.02] Básico
+        [05.02.01] PERT
+            [05.02.01.01] Planilha de Serviços
+                [05.02.01.01.01] Editar PERT
+                [05.02.01.01.02] Detalhes da Atividade
+            [05.02.01.02] Planilha de Atividades
+                [05.02.01.02.01] Editar PERT
+                [05.02.01.02.02] Detalhes da Atividade
+            [05.02.01.03] Planilha Executiva
+            [05.02.01.04] Cenários
+                [05.02.01.04.01] Planilha de Serviços
+                    [05.02.01.04.01.01] Editar PERT
+                    [05.02.01.04.01.02] Detalhes da Atividade
+                [05.02.01.04.02] Planilha de Atividades
+                    [05.02.01.04.02.01] Editar PERT
+                    [05.02.01.04.02.02] Detalhes da Atividade
+        [05.02.06] Cronograma de Preços
+        [05.02.07] Cronograma Desembolso
+            [05.02.07.01] Incluir Pedido Extra
+            [05.02.07.02] Excluir Pedido Extra
+            [05.02.07.03] Alterar pedido Extra
+            [05.02.07.04] Compara Cronograma Desembolso
+            [05.02.07.05] Cronograma Desembolso Salvo
+            [05.02.07.06] Calcula Cronograma Desembolso
+            [05.02.07.07] Calcula Cronograma Desembolso Considerando Contrato
+            [05.02.07.08] Salvar cronograma desembolso
+            [05.02.07.09] Exibe Comparativo dos Cronogramas de Desembolso
+        [05.02.08] Gerar Lançamento Financeiro
+        [05.02.09] Geração de Pedidos
+            [05.02.09.01] Incluir pedido
+            [05.02.09.02] Excluir pedido
+            [05.02.09.03] Editar pedido
+            [05.02.09.04] Enviar pedido para o RM Nucleus
+            [05.02.09.05] Alterar histograma discriminado
+            [05.02.09.06] Autoriza requisição superior a 100% mediante senha
+            [05.02.09.07] Itens de pedido
+            [05.02.09.08] Alterar data de entrega de item de pedido
+            [05.02.09.09] Gerar pedido
+            [05.02.09.10] Gerar movimento por data
+            [05.02.09.11] Gerar um movimento
+            [05.02.09.12] Importar cotação de preço de Suprimentos/Faturamento
+            [05.02.09.13] Rateio de produtos de um insumo
+            [05.02.09.14] Atualizar quantidade solicitada
+            [05.02.09.15] Histograma Agrupado
+            [05.02.09.16] Agrupar
+            [05.02.09.17] Histograma Discriminado
+            [05.02.09.18] Histograma Resumo
+            [05.02.09.19] Rateio de Contrato
+            [05.02.09.20] Excluir Movimentos
+        [05.02.10] Geração de Pedido Extra
+            [05.02.10.01] Incluir pedido extra
+            [05.02.10.02] Excluir pedido extra
+            [05.02.10.03] Editar pedido extra
+            [05.02.10.04] Manter itens de pedido
+            [05.02.10.05] Aprovar pedidos
+            [05.02.10.06] Reprovar pedidos
+            [05.02.10.07] Enviar pedidos para aprovação
+            [05.02.10.08] Finalizar aprovação de pedidos
+            [05.02.10.09] Gerar um movimento de pedido
+            [05.02.10.10] Gerar movimentos por data de pedido
+            [05.02.10.11] Aprovar item extra
+            [05.02.10.12] Reprovar item extra
+            [05.02.10.13] Aprovar parcialmente item extra
+            [05.02.10.14] Colocar item extra em análise
+            [05.02.10.15] Manter motivos de pedidos
+            [05.02.10.16] Excluir Movimentos
+            [05.02.10.17] Fluxo Aprovação Fluig
+            [05.02.10.18] Fluig - Realizar acerto na aprovação
+            [05.02.10.19] Retornar Pedido para Criação
+            [05.02.10.20] Definir Usuário Responsável
+            [05.02.10.21] Copiar Pedido Extra
+        [05.02.11] Integração Orçamento
+            [05.02.11.01] Integração Orçamento com TOTVS Backoffice
+            [05.02.11.02] Detalhes de Integração Orçamentária
+        [05.02.14] Integração com MS Project
+            [05.02.14.01] Exportar para o Project
+            [05.02.14.02] Sincronizar com MS Project
+        [05.02.17] Alocação de Recursos
+            [05.02.17.01] Cronograma de Alocação de Recursos
+            [05.02.17.02] Associar Recursos
+            [05.02.17.03] Exportar Alocação para o Quadro de Permanência
+            [05.02.17.04] Remoção de Recursos Não Utilizados
+            [05.02.17.05] Calcular Alocação de Recursos
+            [05.02.17.06] Limpar Alocação de Recursos
+            [05.02.17.07] Arredondar Alocação de Recursos
+            [05.02.17.08] Calendário de Recursos
+            [05.02.17.09] Alocação de Recurso - Previsto
+            [05.02.17.10] Alocação de Recurso - Alocado
+            [05.02.17.11] Alocação de Recurso - Previsto e Alocado
+            [05.02.17.12] Remover Recursos Alocados
+            [05.02.17.13] Alocação de Recursos - Interprojetos
+                [05.02.17.13.01] Cronograma de Alocação - Recursos
+                [05.02.17.13.02] Cronograma de Alocação - Tarefas
+
+[06] Controle
+    [06.01] Básico
+        [06.01.01] Apropriação de Serviços/Insumos
+            [06.01.01.01] Inserir Aprop. de Insumo/Serviço
+            [06.01.01.02] Excluir Aprop. de Insumo/Serviço
+            [06.01.01.03] Editar Aprop. de Insumo/Serviço
+            [06.01.01.04] Lançamento de Apropriação no Cronograma
+            [06.01.01.05] Apropriação Múltipla por Insumo
+            [06.01.01.06] Apropriação Múltipla por Serviço
+            [06.01.01.07] Mobilidade
+                [06.01.01.07.01] Gerar Apropriação de Mão de Obra
+            [06.01.01.08] Revaloração de Apropriações de Equipamentos
+            [06.01.01.09] Rateio e Revaloração de Mão de Obra
+            [06.01.01.10] Considerar Funcionários Demitidos/Férias na Apropriação de Mão de Obra
+            [06.01.01.11] Gerar Movimento a partir da Apropriação
+            [06.01.01.12] Excluir Movimentos
+
+        [06.01.02] Visão das Apropriações
+            [06.01.02.01] Transferência de Apropriação
+
+        [06.01.03] Contrato
+            [06.01.03.01] Contratos
+                [06.01.03.01.01] Associação
+                    [06.01.03.01.01.01] Associar itens ao contrato
+                    [06.01.03.01.01.02] Associar Total
+                    [06.01.03.01.01.03] Associar Parcial
+                    [06.01.03.01.01.04] Associar Percentual
+                    [06.01.03.01.01.05] Remover Item
+                    [06.01.03.01.01.06] Associar objetos de contratos
+                    [06.01.03.01.01.07] Associar Objetos ao Contrato Extra-Histograma
+                    [06.01.03.01.01.08] Realinhamento
+
+                [06.01.03.01.02] Medição/Consumo
+                    [06.01.03.01.02.01] Atualiza cronograma pelos lançamentos de medição
+                    [06.01.03.01.02.02] Liberar Medição
+                    [06.01.03.01.02.03] Cancelar Liberação de Medição
+                    [06.01.03.01.02.04] Gerar Movimento no RM Nucleus
+                    [06.01.03.01.02.05] Medição
+                    [06.01.03.01.02.06] Edição das informações de liberação de medição
+                    [06.01.03.01.02.07] Autoriza medição superior a 100% mediante senha
+                    [06.01.03.01.02.08] Inserir novo rateio de medição
+                    [06.01.03.01.02.09] Remover rateio de medição
+                    [06.01.03.01.02.10] Editar Rateio de Medição
+                    [06.01.03.01.02.11] Consumir objetos de contratos
+                    [06.01.03.01.02.12] Encerrar a medição do período
+                    [06.01.03.01.02.13] Reabrir a medição do período
+                    [06.01.03.01.02.14] Atualizar Consumo pela Apropriação
+                    [06.01.03.01.02.15] Parâmetro de Medir Contrato Acima de 100%
+                    [06.01.03.01.02.16] Executar Relatório de Boletim de Medição Smart View
+                    [06.01.03.01.02.17] Executar Relatório de Pré-Nota Smart View
+
+                [06.01.03.01.03] Períodos
+                    [06.01.03.01.03.01] Inserir novo Período
+                    [06.01.03.01.03.02] Remover Período
+                    [06.01.03.01.03.03] Editar Período
+                    [06.01.03.01.03.04] Gerar Períodos
+                    [06.01.03.01.03.05] Renumerar Períodos
+                    [06.01.03.01.03.06] Renumerar Períodos Complementares
+                    [06.01.03.01.03.07] Inserir Período Complementar
+                    [06.01.03.01.03.08] Excluir Período Complementar
+                    [06.01.03.01.03.09] Inserir Período Estorno
+                    [06.01.03.01.03.10] Excluir Período Estorno
+                    [06.01.03.01.03.11] Associar períodos de contrato ao cronograma
+                    [06.01.03.01.03.12] Cancelar períodos de contratos com parcelas fixas
+                    [06.01.03.01.03.13] Reativar períodos cancelados em contratos com parcelas fixas
+                    [06.01.03.01.03.14] Marcar/Desmarcar períodos visíveis no portal do fornecedor
+                    [06.01.03.01.03.15] Alterar status dos períodos dos contratos
+
+                [06.01.03.01.04] Reajuste
+                    [06.01.03.01.04.01] Reajuste Definitivo
+                    [06.01.03.01.04.02] Permite reajuste de medição
+                    [06.01.03.01.04.03] Reajustar Itens Associados ao Contrato
+                    [06.01.03.01.04.04] Cancelar Último Reajuste de Itens Associados ao Contrato
+                    [06.01.03.01.04.05] Reajustes do Item Associado
+                    [06.01.03.01.04.06] Reajustes do Objeto Associado
+                    [06.01.03.01.04.07] Cancelar Último Reajuste de Objetos Associados ao Contrato
+
+                [06.01.03.01.05] Adiantamento
+                    [06.01.03.01.05.01] Adiantamento de Contrato
+                    [06.01.03.01.05.02] Liberar Adiantamento de Contrato
+                    [06.01.03.01.05.03] Cancelar Liberação de Adiantamento de Contrato
+                    [06.01.03.01.05.04] Importar Adiantamento do Financeiro
+                    [06.01.03.01.05.05] Liberar Medição - Detalhar Adiantamento
+
+                [06.01.03.01.06] Retenção/Dedução
+                    [06.01.03.01.06.01] Retenções Contratuais
+                    [06.01.03.01.06.02] Liberar Medição - Detalhar Retenções
+                    [06.01.03.01.06.03] Liberar Medição - Detalhar Deduções
+
+                [06.01.03.01.07] Faturamento Direto
+                    [06.01.03.01.07.01] Definir Limite para Faturamento Direto
+                    [06.01.03.01.07.02] Excluir Limite de Faturamento Direto
+                    [06.01.03.01.07.03] Executar Relatório de Pedido de Faturamento Direto Smart View
+                    [06.01.03.01.07.04] Produtos para Faturamento Direto
+                        [06.01.03.01.07.04.01] Incluir Produto
+                        [06.01.03.01.07.04.02] Excluir Produto
+                        [06.01.03.01.07.04.03] Editar Produto
+                    [06.01.03.01.07.05] Cliente/Fornecedor do Faturamento Direto
+                        [06.01.03.01.07.05.01] Incluir Cli/For
+                        [06.01.03.01.07.05.02] Excluir Cli/For
+                        [06.01.03.01.07.05.03] Editar Cli/For
+                    [06.01.03.01.07.06] Pedido do Faturamento Direto
+                        [06.01.03.01.07.06.01] Incluir Pedido
+                        [06.01.03.01.07.06.02] Excluir Pedido
+                        [06.01.03.01.07.06.03] Editar Pedido
+                    [06.01.03.01.07.07] Permitir liberação de Períodos sem saldo no contrato para dedução do Faturamento Direto
+
+                [06.01.03.01.08] Aditivo
+                    [06.01.03.01.08.01] Inserir novo aditivo
+                    [06.01.03.01.08.02] Remover aditivo
+                    [06.01.03.01.08.03] Editar aditivo
+                    [06.01.03.01.08.04] Alterar Quantidade do Item
+
+                [06.01.03.01.09] Aprovações
+                    [06.01.03.01.09.01] Fluxo de Aprovação Fluig
+                    [06.01.03.01.09.02] Verificar estado WF Aprovação de Contrato
+                    [06.01.03.01.09.03] Gerar WF Aprovação de Contrato
+                    [06.01.03.01.09.04] Fluxo de Aprovação de Contratos Fluig
+                    [06.01.03.01.09.05] Alterações de Aprovação de Contratos Fluig
+                    [06.01.03.01.09.06] Cancelar workflow de Aprovação de Contrato
+
+                [06.01.03.01.10] Rateios
+                    [06.01.03.01.10.01] Rateio de itens por produto
+                    [06.01.03.01.10.02] Rateio default para etapas/obras
+                    [06.01.03.01.10.03] Sincronizar rateio com produtos associados
+                    [06.01.03.01.10.04] Departamentos do contrato
+                    [06.01.03.01.10.05] Inserir Rateio Default
+                    [06.01.03.01.10.06] Estados/municípios do contrato
+
+                [06.01.03.01.11] Cliente/Fornecedor Participantes do Contrato
+                    [06.01.03.01.11.01] Incluir
+                    [06.01.03.01.11.02] Alterar
+                    [06.01.03.01.11.03] Excluir
+
+                [06.01.03.01.13] Inserir novo contrato
+                [06.01.03.01.14] Remover Contrato
+                [06.01.03.01.15] Editar Contrato
+                [06.01.03.01.16] Itens / Objetos de Contrato
+                [06.01.03.01.17] Calculo do Contrato
+                [06.01.03.01.18] Vínculo de Contratos
+                [06.01.03.01.19] Manter histórico do contrato
+                [06.01.03.01.20] Alterar Prazo Após Paralização
+                [06.01.03.01.21] Permitir utilizar parâmetros por contrato
+                [06.01.03.01.22] Manter contrato de material
+
+                [06.01.03.01.23] Contatos do Contrato
+                    [06.01.03.01.23.01] Incluir Contatos do Contrato
+                    [06.01.03.01.23.02] Excluir Contatos do Contrato
+                    [06.01.03.01.23.03] Alterar Contatos do Contrato
+
+            [06.01.03.14] Tipo do Detalhamento da Retenção, Dedução e Adiantamento
+                [06.01.03.14.01] Inserir Tipo
+                [06.01.03.14.02] Excluir Tipo
+                [06.01.03.14.03] Editar Tipo
+
+            [06.01.03.15] Movimentos para a Geração de Contrato
+                [06.01.03.15.01] Gerar Contrato a partir do Movimento
+
+        [06.01.08] Diário de Projeto
+            [06.01.08.01] Cadastro
+                [06.01.08.01.01] Incluir Diário de Projeto
+                [06.01.08.01.02] Excluir Diário de Projeto
+                [06.01.08.01.03] Editar Diário de Projeto
+            [06.01.08.02] Classificação
+                [06.01.08.02.01] Incluir Classificação
+                [06.01.08.02.02] Excluir Classificação
+                [06.01.08.02.03] Editar Classificação
+
+        [06.01.11] Análise de Valor Agregado
+            [06.01.11.01] Calcular Índices
+            [06.01.11.02] Incluir Análise
+            [06.01.11.03] Excluir Análise
+            [06.01.11.04] Editar Análise
+
+        [06.01.12] Saldo para fluxo de desembolso
+
+        [06.01.13] Timesheet
+            [06.01.13.01] Equipe de Timesheet
+                [06.01.13.01.01] Incluir Equipe
+                [06.01.13.01.02] Excluir Equipe
+                [06.01.13.01.03] Editar Equipe
+                [06.01.13.01.04] Membros da Equipe
+                [06.01.13.01.05] Histórico de Equipe
+            [06.01.13.02] Apontamentos em Tarefas
+                [06.01.13.02.01] Incluir Apontamento
+                [06.01.13.02.02] Excluir Apontamento
+                [06.01.13.02.03] Editar Apontamento
+                [06.01.13.02.04] Incluir apontamentos por período
+            [06.01.13.03] Monitor de Tarefas
+                [06.01.13.03.01] Executar Tarefa
+
+    [06.02] Mobilidade
+        [06.02.01] Coletores Móveis
+            [06.02.01.01] Inserir Coletores
+            [06.02.01.02] Editar Coletores
+            [06.02.01.03] Ativar Coletores Móveis
+            [06.02.01.04] Desativar Coletores Móveis
+            [06.02.01.05] Associação de Projetos a Coletores (Minha Obra)
+            [06.02.01.06] Associar Folhas Tarefa ao Coletor (Minha Obra)
+            [06.02.01.07] Inserir Coletores automaticamente via app Minhas Inspeções
+
+        [06.02.02] Minha Obra
+            [06.02.02.01] Usuários de Coletores Móveis
+                [06.02.02.01.01] Incluir Usuários
+                [06.02.02.01.02] Excluir Usuários
+                [06.02.02.01.03] Editar Usuários
+                [06.02.02.01.04] Associação de Coletores a Usuários
+                [06.02.02.01.05] QR Code para Configuração Automática
+                [06.02.02.01.06] Equipamentos Associados ao Usuário
+                    [06.02.02.01.06.01] Incluir Associação
+                    [06.02.02.01.06.02] Excluir Associação
+                    [06.02.02.01.06.03] Editar Associação
+                    [06.02.02.01.06.04] Associar Equipamentos
+            [06.02.02.02] Folhas Tarefas
+                [06.02.02.02.01] Incluir Folha Tarefa
+                [06.02.02.02.02] Excluir Folha Tarefa
+                [06.02.02.02.03] Editar Folha Tarefa
+                [06.02.02.02.04] Associar Tarefa à Folha
+                [06.02.02.02.05] Associar Tarefa à Folha
+                [06.02.02.02.06] Cancelar Folha Tarefa
+                [06.02.02.02.07] Encerrar Folha Tarefa
+                [06.02.02.02.08] Interface de Coleta via Código de Barras
+                [06.02.02.02.09] Relatório de Folha Tarefa
+                [06.02.02.02.10] Alocação de Mão de Obra
+                [06.02.02.02.11] Equipes da Folha Tarefa
+                [06.02.02.02.12] Excluir Alocação de Mão de Obra
+                [06.02.02.02.13] Programado x Alocado
+                [06.02.02.02.14] Copiar Folha Tarefa
+                [06.02.02.02.15] Associar Coletores à Folha Tarefa
+                [06.02.02.02.16] Recalcular Planejamento
+                [06.02.02.02.17] Alocar Mão de Obra
+                [06.02.02.02.18] Distribuição de Valores da Equipe
+                [06.02.02.02.19] Permitir Alocação Acima do Valor Disponível
+                [06.02.02.02.20] Membros de Folha Tarefa
+                    [06.02.02.02.20.01] Incluir Membro
+                    [06.02.02.02.20.02] Ativar/Desativar Membro
+                    [06.02.02.02.20.03] Histórico do Membro
+                [06.02.02.02.21] Retornar Folha Tarefa para Em Processamento
+
+            [06.02.02.03] Avanço Físico
+                [06.02.02.03.01] Apontamentos de Avanço Físico
+                    [06.02.02.03.01.01] Editar Apontamento
+                    [06.02.02.03.01.02] Validar Apontamentos
+                [06.02.02.03.02] Visão de Avanço Físico
+
+            [06.02.02.06] Mão de Obra
+                [06.02.02.06.01] Apontamentos de Mão de Obra
+                    [06.02.02.06.01.01] Editar Apontamento
+                    [06.02.02.06.01.02] Excluir Apontamento
+                [06.02.02.06.02] Equipe de Mobilidade
+                    [06.02.02.06.02.01] Incluir Equipe
+                    [06.02.02.06.02.02] Excluir Equipe
+                    [06.02.02.06.02.03] Editar Equipe
+                    [06.02.02.06.02.04] Anexo Membro de Equipe Mobilidade
+                    [06.02.02.06.02.05] Tarefas Associadas
+                    [06.02.02.06.02.06] Apropriação de Mão de Obra
+                    [06.02.02.06.02.07] Alocação de Mão de Obra da Equipe
+                    [06.02.02.06.02.08] Ativar/Desativar Membros
+                    [06.02.02.06.02.09] Histórico de Membro (Folha de Produtividade)
+                [06.02.02.06.03] Pagamento por Produtividade
+                    [06.02.02.06.03.01] Calcular Pagamento
+                        [06.02.02.06.03.01.01] Alterar evento para cálculo
+                    [06.02.02.06.03.02] Gerar Arquivo de Pagamento
+                    [06.02.02.06.03.03] Excluir Pagamento
+
+            [06.02.02.10] Equipamentos
+                [06.02.02.10.01] Apontamentos de Equipamento
+                    [06.02.02.10.01.01] Editar apontamentos dos coletores
+                    [06.02.02.10.01.02] Apropriar Apontamentos
+                    [06.02.02.10.01.03] Enviar Apontamentos para Manutenção de Ativos
+                    [06.02.02.10.01.04] Excluir Apontamentos
+                [06.02.02.10.02] Mapa de Apontamentos
+                [06.02.02.10.03] Custos do Período
+                    [06.02.02.10.03.01] Custos Indiretos
+                        [06.02.02.10.03.01.01] Editar Custos Indiretos
+                        [06.02.02.10.03.01.02] Apropriação de Custos
+                    [06.02.02.10.03.02] Custos Diretos
+                        [06.02.02.10.03.02.01] Editar Custo Direto
+                        [06.02.02.10.03.02.02] Apontamentos
+                        [06.02.02.10.03.02.03] Associar tarefa a Apontamento
+
+                [06.02.02.10.06] Associa Calendário de turnos
+                    [06.02.02.10.06.01] Incluir Calendário
+                    [06.02.02.10.06.02] Excluir Calendário
+                    [06.02.02.10.06.03] Editar Calendário
+                    [06.02.02.10.06.04] Importar Calendário Protheus
+
+                [06.02.02.10.07] Equipamentos Associados ao Projeto
+                    [06.02.02.10.07.01] Incluir Associação
+                    [06.02.02.10.07.02] Excluir Associação
+                    [06.02.02.10.07.03] Editar Associação
+                    [06.02.02.10.07.04] Associar Equipamentos ao Projeto
+
+            [06.02.02.16] Ciclo de Transporte
+                [06.02.02.16.01] Ciclo de Transporte
+                    [06.02.02.16.01.01] Incluir Ciclo
+                    [06.02.02.16.01.02] Excluir Ciclo
+                    [06.02.02.16.01.03] Editar Ciclo
+                    [06.02.02.16.01.04] Apontamentos dos Coletores
+                        [06.02.02.16.01.04.01] Incluir Apontamento
+                        [06.02.02.16.01.04.02] Excluir Apontamento
+                        [06.02.02.16.01.04.03] Editar Apontamento
+                    [06.02.02.16.01.05] Apontamentos Conciliados
+                    [06.02.02.16.01.06] Conciliar Apontamentos
+                    [06.02.02.16.01.07] Apropriar Custos de Apontamentos
+                    [06.02.02.16.01.08] Desfazer Conciliação
+                    [06.02.02.16.01.09] Validar Apontamentos
+                    [06.02.02.16.01.10] Capacidade do Bem (Projetos)
+
+            [06.02.02.18] Movimentações de Produto
+                [06.02.02.18.01] Tipos de Movimentações de Produto
+                    [06.02.02.18.01.01] Incluir Tipos (TCOP)
+                    [06.02.02.18.01.02] Excluir Tipos (TCOP)
+                    [06.02.02.18.01.03] Editar Tipos (TCOP)
+
+            [06.02.02.20] Status de Carga
+            [06.02.02.21] Log de Importação e Exportação
+
+        [06.02.12] Minhas Inspeções
+            [06.02.12.01] Plano de criação de Inspeções
+                [06.02.12.01.01] Incluir Plano
+                [06.02.12.01.02] Excluir Plano
+                [06.02.12.01.03] Editar Plano
+                [06.02.12.01.04] Agendar execução
+                [06.02.12.01.05] Log e execução
+            [06.02.12.02] Dashboard
+            [06.02.12.03] Formulários
+                [06.02.12.03.01] Incluir Formulário
+                [06.02.12.03.02] Excluir Formulário
+                [06.02.12.03.03] Editar Formulário
+                [06.02.12.03.04] Clonar Formulário
+            [06.02.12.04] Inspeções
+                [06.02.12.04.01] Incluir Inspeções
+                [06.02.12.04.02] Excluir Inspeções
+                [06.02.12.04.03] Processos Inspeção
+                    [06.02.12.04.03.01] Ajustar Inspeção
+                    [06.02.12.04.03.02] Avaliar Inspeção
+                    [06.02.12.04.03.03] Responder Inspeção
+            [06.02.12.05] Workflow
+                [06.02.12.05.01] Incluir Workflow
+                [06.02.12.05.02] Editar Workflow
+                [06.02.12.05.03] Excluir Workflow
+            [06.02.12.06] Grupo de Usuários
+                [06.02.12.06.01] Inserir Grupo
+                [06.02.12.06.02] Editar Grupo
+                [06.02.12.06.03] Excluir Grupo
+            [06.02.12.07] BIM
+
+        [06.02.14] Diário de Obra
+            [06.02.14.01] Formulários
+                [06.02.14.01.01] Incluir Formulário
+                [06.02.14.01.02] Excluir Formulário
+                [06.02.14.01.03] Editar Formulário
+                [06.02.14.01.04] Clonar Formulário
+            [06.02.14.02] Anotações do Dia
+                [06.02.14.02.01] Incluir Anotações
+                [06.02.14.02.02] Excluir Anotações
+                [06.02.14.02.03] Processos Anotações
+                    [06.02.14.02.03.01] Ajustar Anotações
+                    [06.02.14.02.03.02] Avaliar Anotações
+                    [06.02.14.02.03.03] Responder Anotações
+            [06.02.14.03] Workflow
+                [06.02.14.03.01] Incluir Workflow
+                [06.02.14.03.02] Editar Workflow
+                [06.02.14.03.03] Excluir Workflow
+            [06.02.14.04] BIM
+            [06.02.14.05] RDO - Relatório do Diário de Obra
+
+        [06.02.15] Portal de medição do fornecedor
+            [06.02.15.01] Dashboard
+                [06.02.15.01.01] Previsto
+                [06.02.15.01.02] Adiantamento Descontado
+                [06.02.15.01.03] Deduções
+                [06.02.15.01.04] Valores Retidos
+                [06.02.15.01.05] Deduções Faturamento direto
+                [06.02.15.01.06] Situação dos contratos
+            [06.02.15.02] Medição
+            [06.02.15.03] Faturamento Direto
+            [06.02.15.04] Permitir acesso a todos os Fornecedores sem associação
+
+    [06.03] Consultas
+        [06.03.01] Movimentações do BackOffice e Apropriações
+                    
+[07] Manutenção de Equipamentos
+    [07.01] Cadastros
+        [07.01.01] Objetos de Manutenção
+            [07.01.01.01] Objeto de Manutenção
+                [07.01.01.01.01] Gerar Objeto de Manutenção a partir do Patrimônio
+                [07.01.01.01.02] Inserir novo objeto de manutenção
+                [07.01.01.01.03] Remover objeto de manutenção
+                [07.01.01.01.04] Alterar objeto de manutenção
+                [07.01.01.01.05] Inserir novo indicador de uso
+                [07.01.01.01.06] Remover indicador de uso
+                [07.01.01.01.07] Inserir nova alteração de medidor
+                [07.01.01.01.08] Remover alteração de medidor
+                [07.01.01.01.09] Associar Objeto de Manutenção a Bem Patrimonial
+                [07.01.01.01.10] Calcular média diária de vários Objetos de Manutenção simultaneamente
+                [07.01.01.01.11] Converter Indicadores de Uso
+                [07.01.01.01.12] Inserir produto no objeto de manutenção
+                [07.01.01.01.13] Remover produto do objeto de manutenção
+                [07.01.01.01.14] Alterar produto do objeto de manutenção
+                [07.01.01.01.15] Atualizar produto(s) do objeto de manutenção
+                [07.01.01.01.16] Enviar objeto para Estoque
+                [07.01.01.01.17] Retirar Objeto do Estoque
+                [07.01.01.01.18] Sucatear Objeto
+                [07.01.01.01.19] Cancelar Sucateamento do Objeto
+                [07.01.01.01.20] Transferência de Objeto entre Coligada
+                [07.01.01.01.21] Transferência de Objeto entre Filiais
+                [07.01.01.01.22] Transferência de Objeto entre Localidades
+                [07.01.01.01.23] Permitir Cancelar Agregação/Desagregação
+                [07.01.01.01.24] Transferência de Objetos entre Centros de Custos
+                [07.01.01.01.25] Transferência entre Projetos
+                [07.01.01.01.26] Cancelar Transferência de Centro de Custo
+                [07.01.01.01.27] Alterar Indicador de Uso
+                [07.01.01.01.28] Geração de Movimento por Indicador Selecionado
+                [07.01.01.01.29] Geração de Movimento por Indicador por Período
+                [07.01.01.01.30] Histórico do Projeto
+                    [07.01.01.01.30.01] Cancelar Transferência de Projeto
+
+        [07.01.01.03] Tipo de Objeto de Manutenção
+            [07.01.01.03.01] Inserir Produto do Tipo de Objeto de Manutenção
+            [07.01.01.03.02] Remover Produto do Tipo de Objeto de Manutenção
+            [07.01.01.03.03] Alterar Produto do Tipo de Objeto de Manutenção
+            [07.01.01.03.04] Inserir Modelo
+            [07.01.01.03.05] Remover Modelo
+            [07.01.01.03.06] Alterar Modelo
+            [07.01.01.03.07] Inserir Produto do Modelo
+            [07.01.01.03.08] Remover Produto do Modelo
+            [07.01.01.03.09] Alterar Produto do Modelo
+            [07.01.01.03.10] Inserir SubModelo
+            [07.01.01.03.11] Remover SubModelo
+            [07.01.01.03.12] Alterar SubModelo
+            [07.01.01.03.13] Inserir Produto do SubModelo
+            [07.01.01.03.14] Remover Produto do SubModelo
+            [07.01.01.03.15] Alterar Produto do SubModelo
+            [07.01.01.03.16] Incluir Tipos de Objetos de Manutenção
+            [07.01.01.03.17] Excluir Tipos de Objetos de Manutenção
+            [07.01.01.03.18] Editar Tipos de Objetos de Manutenção
+
+        [07.01.01.04] Status do Objeto de Manutenção
+            [07.01.01.04.01] Incluir Status do Objeto de Manutenção
+            [07.01.01.04.02] Excluir Status do Objeto de Manutenção
+            [07.01.01.04.03] Editar Status do Objeto de Manutenção
+
+        [07.01.01.05] Motivos
+            [07.01.01.05.01] Motivos de Agregação
+                [07.01.01.05.01.01] Incluir Motivos de Agregação
+                [07.01.01.05.01.02] Excluir Motivos de Agregação
+                [07.01.01.05.01.03] Editar Motivos de Agregação
+            [07.01.01.05.02] Motivos de Retirada
+                [07.01.01.05.02.01] Incluir Motivos de Retirada
+                [07.01.01.05.02.02] Excluir Motivos de Retirada
+                [07.01.01.05.02.03] Editar Motivos de Retirada
+            [07.01.01.05.03] Motivo de Sucateamento
+                [07.01.01.05.03.01] Incluir Motivo de Sucateamento
+                [07.01.01.05.03.02] Excluir Motivo de Sucateamento
+                [07.01.01.05.03.03] Editar Motivo de Sucateamento
+            [07.01.01.05.04] Motivo de Transferência
+                [07.01.01.05.04.01] Incluir Motivo de Transferência
+                [07.01.01.05.04.02] Excluir Motivo de Transferência
+                [07.01.01.05.04.03] Editar Motivo de Transferência
+
+        [07.01.01.10] Pneus
+            [07.01.01.10.01] Modelo de Borracha (desenho)
+                [07.01.01.10.01.01] Incluir Modelo de Desenho
+                [07.01.01.10.01.02] Excluir Modelo de Desenho
+                [07.01.01.10.01.03] Editar Modelo de Desenho
+            [07.01.01.10.02] Tipo de Borracha
+                [07.01.01.10.02.01] Incluir Tipo de Borracha
+                [07.01.01.10.02.02] Excluir Tipo de Borracha
+                [07.01.01.10.02.03] Editar Tipo de Borracha
+            [07.01.01.10.03] Processo de Reforma
+                [07.01.01.10.03.01] Incluir Processo de Reforma
+                [07.01.01.10.03.02] Excluir Processo de Reforma
+                [07.01.01.10.03.03] Editar Processo de Reforma
+
+    [07.01.07] Tabelas
+        [07.01.07.01] Manutenção
+            [07.01.07.01.01] Plano de Manutenção
+                [07.01.07.01.01.01] Incluir Plano de Manutenção
+                [07.01.07.01.01.02] Excluir Plano de Manutenção
+                [07.01.07.01.01.03] Editar Plano de Manutenção
+                [07.01.07.01.01.04] Copiar planos de manutenção
+                [07.01.07.01.01.05] Inicialização de Planos de Manutenção
+                [07.01.07.01.01.06] Solicitar Geração Automática de OS
+
+            [07.01.07.01.02] Índice de Acompanhamento
+                [07.01.07.01.02.01] Incluir Índices de Acompanhamento
+                [07.01.07.01.02.02] Excluir Índices de Acompanhamento
+                [07.01.07.01.02.03] Editar Índices de Acompanhamento
+
+        [07.01.07.04] Ordem de Serviço
+            [07.01.07.04.01] Problemas
+                [07.01.07.04.01.01] Incluir Problemas
+                [07.01.07.04.01.02] Excluir Problemas
+                [07.01.07.04.01.03] Editar Problemas
+            [07.01.07.04.02] Motivo de Cancelamento da OS
+                [07.01.07.04.02.01] Incluir Motivo do Cancelamento da OS
+                [07.01.07.04.02.02] Excluir Motivo do Cancelamento da OS
+                [07.01.07.04.02.03] Editar Motivo do Cancelamento da OS
+            [07.01.07.04.03] Justificativa de Interrupção
+                [07.01.07.04.03.01] Incluir Justificativas de Interrupção
+                [07.01.07.04.03.02] Excluir Justificativas de Interrupção
+                [07.01.07.04.03.03] Editar Justificativas de Interrupção
+
+        [07.01.07.08] Campos Complementares
+            [07.01.07.08.01] Objeto de Manutenção
+            [07.01.07.08.02] Medição de índice de Acompanhamento
+            [07.01.07.08.03] Medição de índice de Uso
+
+        [07.01.07.12] GoodCard Ecofrotas
+            [07.01.07.12.01] Tipo de Material
+            [07.01.07.12.02] Tipo de Serviço
+
+    [07.01.12] Mão de Obra
+        [07.01.12.04] Agenda Técnica da Mão de Obra do Serviço
+            [07.01.12.04.01] Incluir Agendamento de Mão de Obra
+            [07.01.12.04.02] Excluir Agendamento de Mão de Obra
+            [07.01.12.04.03] Editar Agendamento de Mão de Obra
+        [07.01.12.05] Incluir Mãos-de-Obra
+        [07.01.12.06] Excluir Mãos-de-Obra
+        [07.01.12.07] Editar Mãos-de-Obra
+        [07.01.12.08] Histórico de custo da mão-de-obra
+        [07.01.12.09] Atualização de Custo
+
+    [07.02] Manutenção
+        [07.02.01] OS
+            [07.02.01.01] Movimentos Relacionados
+                [07.02.01.01.01] Movimentos Relacionados à OS
+                [07.02.01.01.02] Remover movimentos relacionados à OS
+                [07.02.01.01.03] Remover itens de movimentos relacionados à OS
+
+            [07.02.01.02] Apontamento da OS
+                [07.02.01.02.01] Inserir Apontamento
+                [07.02.01.02.02] Excluir Apontamento
+                [07.02.01.02.03] Alterar Apontamento
+                [07.02.01.02.04] Apontar horas de todas as Mãos-de-Obra alocadas
+                [07.02.01.02.05] Iniciar/Interromper/Terminar Apontamento de Mão de Obra
+
+            [07.02.01.03] Itens da OS
+                [07.02.01.03.01] Inserir Novo Item
+                [07.02.01.03.02] Remover Item
+                [07.02.01.03.03] Alterar Item
+                [07.02.01.03.04] Alterar Item da OS com status Terminado
+
+            [07.02.01.04] Processamento da OS
+                [07.02.01.04.01] Executar Processamento
+                [07.02.01.04.02] Cancelar Processamento
+                [07.02.01.04.03] Dispensar Processamento
+
+            [07.02.01.05] Inserir nova ordem de serviço
+            [07.02.01.06] Remover ordem de serviço
+            [07.02.01.07] Alterar ordem de serviço
+            [07.02.01.08] Geração de Movimentos (Entrada)
+            [07.02.01.09] Geração de Movimentos (Saída)
+            [07.02.01.10] Desconto nas Ordens de Serviços
+            [07.02.01.11] Despesa nas Ordens de Serviços
+            [07.02.01.12] Requisição de Material
+            [07.02.01.13] Desmembrar itens com produtos compostos
+            [07.02.01.14] Iniciar execução dos serviços orçados
+            [07.02.01.15] Cancelar OS
+            [07.02.01.16] Terminar Análise
+            [07.02.01.17] Marcar OS para Faturamento
+            [07.02.01.18] Reiniciar a OS
+            [07.02.01.19] Terminar execução da OS
+            [07.02.01.20] Alterar Indicador de uso na OS
+            [07.02.01.21] Terminar OS com status Não iniciado
+            [07.02.01.22] Alterar OS com status A Faturar
+            [07.02.01.23] Alterar OS com status Terminado
+            [07.02.01.24] Apropriar produtos com vida útil não vencida
+            [07.02.01.25] Não Consistir Data de Programação
+            [07.02.01.26] Retornar OS para status Terminado
+            [07.02.01.27] Alterar OS gerada a partir de Atendimento do RM Agilis
+            [07.02.01.28] Realizar Movimentação sobre OS Terminada/Faturada/Cancelada
+            [07.02.01.29] Copiar Ordem de Serviço
+            [07.02.01.30] Recalcular custo da ordem de serviço
+
+        [07.02.06] OS de Terceiros
+            [07.02.06.01] Inserir nova ordem de serviço
+            [07.02.06.02] Remover ordem de serviço
+            [07.02.06.03] Alterar ordem de serviço
+
+        [07.02.07] Atividades
+            [07.02.07.01] Consumo
+                [07.02.07.01.01] Inserir nova Apropriação
+                [07.02.07.01.02] Remover Apropriação
+                [07.02.07.01.03] Remover Item da Apropriação
+            [07.02.07.02] Importação de Indicadores de Uso
+                [07.02.07.02.01] Importação
+                [07.02.07.02.02] Histórico
+                    [07.02.07.02.02.01] Estornar Importação de Lançamento de Indicadores de Uso
+                [07.02.07.02.03] Layout
+                    [07.02.07.02.03.01] Incluir Layout de Importação
+                    [07.02.07.02.03.02] Excluir Layout de Importação
+                    [07.02.07.02.03.03] Editar Layout de Importação
+
+            [07.02.07.06] Vencimento de Plano(s) de Manutenção
+                [07.02.07.06.01] Atualizar Vencimentos do Plano de Manutenção
+
+            [07.02.07.07] Geração Automática de OS
+
+[08] Gestão de Risco
+    [08.01] Básico
+        [08.01.01] Equipe do Projeto
+            [08.01.01.01] Inserir
+            [08.01.01.02] Excluir
+            [08.01.01.03] Editar
+            [08.01.01.04] Anexo Membro de Equipe Risco
+            [08.01.01.05] Histórico de Equipe
+
+        [08.01.02] Objetivos do Projeto
+            [08.01.02.01] Objetivos
+                [08.01.02.01.01] Inserir
+                [08.01.02.01.02] Excluir
+                [08.01.02.01.03] Editar
+                [08.01.02.01.04] Fator de Conversão para Moeda do Projeto
+            [08.01.02.02] Grupo de Objetivos
+                [08.01.02.02.01] Inserir
+                [08.01.02.02.02] Excluir
+                [08.01.02.02.03] Editar
+
+        [08.01.05] Escalas
+            [08.01.05.01] Inserir
+            [08.01.05.02] Excluir
+            [08.01.05.03] Editar
+
+        [08.01.06] Grupo de Áreas de Prioridade
+            [08.01.06.01] Inserir
+            [08.01.06.02] Excluir
+            [08.01.06.03] Editar
+
+        [08.01.07] EAR
+            [08.01.07.01] Inserir
+            [08.01.07.02] Excluir
+            [08.01.07.03] Editar
+
+        [08.01.08] Riscos
+            [08.01.08.01] Inserir
+            [08.01.08.02] Excluir
+            [08.01.08.03] Editar
+            [08.01.08.04] Reuniões
+            [08.01.08.05] Tarefas Associadas
+            [08.01.08.06] Impacto e Probabilidade
+            [08.01.08.07] Estratégias
+            [08.01.08.08] Matriz de Objetivos
+            [08.01.08.09] Planejar Resposta
+            [08.01.08.10] Calcular Risco
+            [08.01.08.11] Gerar Matriz de Riscos
+
+        [08.01.09] Reuniões
+            [08.01.09.01] Inserir
+            [08.01.09.02] Excluir
+            [08.01.09.03] Editar
+            [08.01.09.04] Riscos
+            [08.01.09.05] Matriz de impacto e probabilidade de riscos
+            [08.01.09.06] Encerrar reunião
+            [08.01.09.07] Realizar reabertura de reunião
+            [08.01.09.08] Calcular matriz de impacto e probabilidade de riscos
+
+[09] Concorrência Eletrônica
+    [09.01] Básico
+        [09.01.01] Gerar Proj. Licitação
+        [09.01.02] Gerenciador
+            [09.01.02.01] Editar Gerenciador
+        [09.01.03] Equalizador
+        [09.01.04] Gerar Contrato
+            [09.01.04.01] Incluir Contrato
+        [09.01.05] Rodadas de Negociação
+
+[10] Indicadores
+    [10.01] Curvas
+        [10.01.01] Curva ABC
+        [10.01.02] Curva S
+
+    [10.02] Relatórios
+        [10.02.01] Plano de Ação
+        [10.02.02] Cronograma Mensal
+        [10.02.03] Relatórios Periódicos
+        [10.02.04] Curva ABC
+        [10.02.05] Histograma de Insumos por Tarefas
+        [10.02.06] Tarefas
+            [10.02.06.01] Planilha de tarefas
+
+        [10.02.08] Composições
+            [10.02.08.01] Composições do projeto
+            [10.02.08.02] Composições de custo horário
+            [10.02.08.03] Relatório Padrão Derba
+
+        [10.02.12] Insumos
+            [10.02.12.01] Insumos do projeto
+            [10.02.12.02] Insumos por tarefa
+
+        [10.02.15] Contratos
+            [10.02.15.01] Contratos
+            [10.02.15.02] Medição Completa
+
+        [10.02.18] Minha Obra
+            [10.02.18.01] Folha Tarefa
+            [10.02.18.02] Feedback
+            [10.02.18.03] Ciclo de Transporte
+            [10.02.18.04] Membros de Equipe
+
+    [10.03] Dash Board
+        [10.03.01] Dashboard de Indicadores
+
+[11] Segurança
+    [11.01] Básico
+        [11.01.01] Permissão de Acesso a Projetos
+
+[12] Desconsiderar filtro do produto em WebService
+
+[13] Customização
+    [13.01] Customização
+        [13.01.01] Pacote de Serviço
+            [13.01.01.01] Incluir Pacote de Serviço
+            [13.01.01.02] Excluir Pacote de Serviço
+            [13.01.01.03] Editar Pacote de Serviço
+            [13.01.01.04] Definir Leiaute
+
+        [13.01.02] Equipe de Produção
+            [13.01.02.01] Incluir Equipe de Produção
+            [13.01.02.02] Excluir Equipe de Produção
+            [13.01.02.03] Editar Equipe de Produção
+            [13.01.02.04] Definir Leiaute
+
+        [13.01.03] Medições Equipes, Pacotes e Tarefas
+            [13.01.03.01] Incluir Medições
+            [13.01.03.02] Excluir Medições
+            [13.01.03.03] Editar Medições
+            [13.01.03.04] Definir Leiaute
+
+        [13.01.04] Folha ADM
+            [13.01.04.01] Incluir Folha ADM
+            [13.01.04.02] Excluir Folha ADM
+            [13.01.04.03] Editar Folha ADM
+            [13.01.04.04] Definir Leiaute
+
+        [13.01.05] Funcionários da Equipe
+            [13.01.05.01] Incluir Funcionários da Equipe
+            [13.01.05.02] Excluir Funcionários da Equipe
+            [13.01.05.03] Editar Funcionários da Equipe
+            [13.01.05.04] Definir Leiaute
+
+        [13.01.06] Valores Apropriação
+            [13.01.06.01] Incluir Valores Apropriação
+            [13.01.06.02] Excluir Valores Apropriação
+            [13.01.06.03] Editar Valores Apropriação
+            [13.01.06.04] Definir Leiaute
+
+        [13.01.07] Ocorrências Funcionários
+            [13.01.07.01] Incluir Ocorrências
+            [13.01.07.02] Excluir Ocorrências
+            [13.01.07.03] Editar Ocorrências
+            [13.01.07.04] Definir Leiaute
+
+        [13.01.08] Status
+            [13.01.08.01] Incluir Status
+            [13.01.08.02] Excluir Status
+            [13.01.08.03] Editar Status
+            [13.01.08.04] Definir Leiaute
+
+        [13.01.09] Tarefas do Pacote
+            [13.01.09.01] Incluir Tarefas
+            [13.01.09.02] Excluir Tarefas
+            [13.01.09.03] Editar Tarefas
+            [13.01.09.04] Definir Leiaute
+
+    [13.02] Controle de Produtividade
+        [13.02.01] Equipe
+            [13.02.01.01] Inserir registro - Equipe
+            [13.02.01.02] Excluir registro - Equipe
+            [13.02.01.03] Editar registro - Equipe
+
+        [13.02.02] Apontamento Equipe
+            [13.02.02.01] Inserir registro - Apontamento Equipe
+            [13.02.02.02] Excluir registro - Apontamento Equipe
+            [13.02.02.03] Editar registro - Apontamento Equipe
+
+        [13.02.03] Geração de Apontamento de Equipe
+            [13.02.03.01] Inserir registro - Geração de Apontamento
+            [13.02.03.02] Excluir registro - Geração de Apontamento
+            [13.02.03.03] Editar registro - Geração de Apontamento
+
+    [13.03] Solicitação ALCEN
+        [13.03.01] Inserir registro - Parâmetros de Customização
+        [13.03.02] Excluir registro - Parâmetros de Customização
+        [13.03.03] Editar registro - Parâmetros de Customização
+
+[14] by Worknow
+    [14.01] Automação
+        [14.01.01] WorkChat
+            [14.01.01.01] Processamento de Envios
+            [14.01.01.02] Executar Integração WorkChat
+                [14.01.01.02.01] Inserir registro - Executar Integração WorkChat
+                [14.01.01.02.02] Excluir registro - Executar Integração WorkChat
+                [14.01.01.02.03] Editar registro - Executar Integração WorkChat
+            [14.01.01.03] Inserir registro - Parâmetros WorkChat
+            [14.01.01.04] Excluir registro - Parâmetros WorkChat
+            [14.01.01.05] Editar registro - Parâmetros WorkChat
+
+[15] Gestão
+    [15.01] Utilitários
+        [15.01.01] Calculadora
+        [15.01.02] Agenda
+            [15.01.02.01] Inserir compromisso
+            [15.01.02.02] Remover compromisso
+            [15.01.02.03] Editar compromisso
+        [15.01.03] TOTVS Compartilhamento
+
+    [15.02] Ferramentas de Análise
+        [15.02.01] Cubo
+            [15.02.01.01] Cadastro de Cubos
+                [15.02.01.01.01] Inserir Cubo
+                [15.02.01.01.02] Excluir Cubo
+                [15.02.01.01.03] Editar Cubo
+            [15.02.01.02] Excluir Cubo
+            [15.02.01.03] Alterar Cubo
+            [15.02.01.04] Visualizar Cubo
+            [15.02.01.05] Atualizar Cubo
+            [15.02.01.06] Exportar Cubo para CUBX
+            [15.02.01.07] Exportar Cubo para documento (XLS, PDF, RTF etc.)
+            [15.02.01.08] Imprimir Cubo
+            [15.02.01.09] Salvar Gráfico
+
+        [15.02.03] Planilha Net
+            [15.02.03.01] Incluir Planilha Net
+            [15.02.03.02] Excluir Planilha Net
+            [15.02.03.03] Editar Planilha Net
+            [15.02.03.04] Configurar parâmetro de recálculo automático na inicialização
+            [15.02.03.05] Habilitar botão Salvar
+            [15.02.03.06] Habilitar salvar como Excel
+            [15.02.03.07] Converter planilha Excel para RM
+            [15.02.03.08] Reexecutar consulta SQL da célula
+            [15.02.03.09] Visualizar consulta SQL da célula
+            [15.02.03.10] Associar consulta SQL à célula
+            [15.02.03.11] Desassociar consulta SQL da célula
+            [15.02.03.12] Ordem de execução das consultas SQL
+            [15.02.03.13] Reexecutar consultas SQL de todas as planilhas
+            [15.02.03.14] Reexecutar consultas SQL da planilha atual
+            [15.02.03.15] Recalcular automaticamente
+            [15.02.03.16] Associar variável à célula
+            [15.02.03.17] Adicionar gráfico
+            [15.02.03.18] Remover gráfico
+            [15.02.03.19] Editar gráfico
+
+        [15.02.04] Fórmula Visual
+            [15.02.04.01] Atividades
+                [15.02.04.01.01] Incluir Atividades
+                [15.02.04.01.02] Excluir Atividades
+                [15.02.04.01.03] Editar Atividades
+            [15.02.04.02] Categorias
+                [15.02.04.02.01] Incluir Categorias
+                [15.02.04.02.02] Excluir Categorias
+                [15.02.04.02.03] Editar Categorias
+            [15.02.04.03] Fórmula Visual
+                [15.02.04.03.01] Incluir Fórmula Visual
+                [15.02.04.03.02] Excluir Fórmula Visual
+                [15.02.04.03.03] Editar Fórmula Visual
+                [15.02.04.03.04] Executar Fórmula Visual
+
+        [15.02.08] Smart View
+            [15.02.08.01] Inserir Recurso
+            [15.02.08.02] Excluir Recurso
+            [15.02.08.03] Editar Recurso
+            [15.02.08.04] Processos
+                [15.02.08.04.01] Importar Recurso
+                [15.02.08.04.02] Exportar Recurso
+
+        [15.02.09] Acelerador de Migração
+
+        [15.02.10] RM Reports
+            [15.02.10.01] Inserir relatório
+            [15.02.10.02] Excluir relatório
+            [15.02.10.03] Editar relatório
+            [15.02.10.04] Processos
+                [15.02.10.04.01] Copiar Relatórios
+                [15.02.10.04.02] Editar Estrutura
+                [15.02.10.04.03] Importar Relatórios
+                [15.02.10.04.04] Exportar Relatórios
+                [15.02.10.04.05] Gerar Relatórios
+
+        [15.02.11] Visões de Dados
+            [15.02.11.01] Incluir Consultas SQL
+            [15.02.11.02] Excluir Consultas SQL
+            [15.02.11.03] Editar Consultas SQL
+
+        [15.02.12] Painéis de Cenários
+            [15.02.12.01] Inserir novo RMPart
+            [15.02.12.02] Renomear Guia
+            [15.02.12.03] Deletar Guia
+            [15.02.12.04] Exportar Cenário
+            [15.02.12.05] Importar Cenário
+            [15.02.12.06] Alterar Parâmetros
+
+        [15.02.13] Gerador de Saída
+            [15.02.13.01] Executar
+            [15.02.13.02] Incluir Layout
+            [15.02.13.03] Excluir Layout
+            [15.02.13.04] Alterar Layout
+            [15.02.13.05] Importar layout
+            [15.02.13.06] Exportar layout
+
+    [15.03] Gráficos
+        [15.03.01] Gráfico
+            [15.03.01.01] Incluir Gráficos
+            [15.03.01.02] Excluir Gráficos
+            [15.03.01.03] Editar Gráficos
+            [15.03.01.04] Visualizar Gráficos
+        [15.03.02] Categorias
+            [15.03.02.01] Incluir Categorias de Gráficos
+            [15.03.02.02] Excluir Categorias de Gráficos
+            [15.03.02.03] Editar Categorias de Gráficos
+        [15.03.03] Fontes de Gráficos
+
+    [15.04] RSS
+        [15.04.01] Leitor RSS
+            [15.04.01.01] Receber e-mails de novos feeds
+        [15.04.02] Iniciar Serviço
+        [15.04.03] Configuração
+        [15.04.04] Canais RSS
+            [15.04.04.01] Incluir Canal RSS
+            [15.04.04.02] Excluir Canal RSS
+            [15.04.04.03] Editar Canal RSS
+        [15.04.05] Meus Canais
+
+    [15.05] RM Conector
+        [15.05.01] RM Conector
+            [15.05.01.01] Exportação
+            [15.05.01.02] Importação
+            [15.05.01.03] Gerenciamento
+
+    [15.06] Comunicação
+        [15.06.01] Aplicativos Externos
+            [15.06.01.01] Inserir aplicativo externo
+            [15.06.01.02] Remover aplicativo externo
+            [15.06.01.03] Editar aplicativo externo
+            [15.06.01.04] Customizar Aplicativo Externo
+            [15.06.01.05] Gerenciamento de Correspondências RM × Provedores
+
+        [15.06.02] Aplicativos SAML
+            [15.06.02.01] Inserir aplicativos SAML
+            [15.06.02.02] Remover aplicativos SAML
+            [15.06.02.03] Editar aplicativos SAML
+
+[16] Ambiente
+    [16.01] Processos
+        [16.01.01] Gerenciamento de Jobs
+            [16.01.01.01] Iniciar Servidor
+            [16.01.01.02] Interromper Servidor
+            [16.01.01.03] Finalizar Servidor
+            [16.01.01.04] Interromper Job
+            [16.01.01.05] Ativar Job
+            [16.01.01.06] Desativar Job
+            [16.01.01.07] Consultar Jobs emitidos de todos os Usuários
+            [16.01.01.08] Excluir Job
+
+        [16.01.02] Relatórios Gerados
+            [16.01.02.01] Exclusão em bloco de relatórios gerados
+
+        [16.01.03] Cockpit
+
+        [16.01.04] Segurança de Jobs Fracionáveis
+            [16.01.04.01] Incluir Jobs Fracionáveis
+            [16.01.04.02] Excluir Jobs Fracionáveis
+            [16.01.04.03] Editar Jobs Fracionáveis
+
+    [16.02] Configuração
+        [16.02.01] Diagnóstico do Sistema
+            [16.02.01.01] Gerar Diagnóstico
+
+        [16.02.02] Deploy Granular
+
+        [16.02.03] Parâmetros
+            [16.02.03.01] Construção e Projetos
+
+    [16.03] TOTVS Fluig
+
+    [16.04] Ajuda
+        [16.04.01] Sobre
+        [16.04.02] Links
+
+[17] Permissões Globais
+    [17.01] Filtros
+        [17.01.01] Filtros Globais
+        [17.01.02] Filtros Relatórios
+
+    [17.02] Processos
+        [17.02.01] Reportar para TOTVS
+
+    [17.03] Repositório de arquivos
+  </script>
+
+  <script>
+    function construirArvoreMenus() {
+      const raw = document.getElementById('raw-menus').textContent.split('\n');
+      const treeContainer = document.getElementById('tree');
+      const rootUl = document.createElement('ul');
+      treeContainer.appendChild(rootUl);
+
+      const stack = [{ indent: -1, ul: rootUl }];
+
+      raw.forEach(line => {
+        if (!line.trim()) return;
+        const indent = line.match(/^\s*/)[0].length;
+        const text = line.trim();
+
+        while (indent <= stack[stack.length - 1].indent) stack.pop();
+        const parentUl = stack[stack.length - 1].ul;
+
+        const li = document.createElement('li');
+
+        const arrow = document.createElement('span');
+        arrow.className = "toggle-arrow";
+        arrow.innerHTML = `
+          <svg class="arrow-icon" viewBox="0 0 24 24">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+        `;
+
+        const label = document.createElement('label');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = "menu-checkbox";
+        label.appendChild(cb);
+        label.appendChild(document.createTextNode(" " + text));
+
+        const linha = document.createElement('div');
+        linha.className = "tree-line";
+        linha.appendChild(arrow);
+        linha.appendChild(label);
+
+        li.appendChild(linha);
+        parentUl.appendChild(li);
+
+        const childUl = document.createElement('ul');
+        li.appendChild(childUl);
+
+        stack.push({ indent, ul: childUl });
+      });
+
+      document.querySelectorAll('#tree li').forEach(li => {
+        const childUl = li.querySelector(':scope > ul');
+        if (!childUl || childUl.children.length === 0) {
+          li.querySelector('.toggle-arrow').remove();
+        } else {
+          li.classList.add('collapsed');
+        }
+      });
+
+      ativarSetinhas();
+      ativarPropagacao();
+    }
+
+    function ativarSetinhas() {
+      document.querySelectorAll('.toggle-arrow').forEach(arrow => {
+        arrow.addEventListener('click', () => {
+          const li = arrow.closest('li');
+          const icon = arrow.querySelector('.arrow-icon');
+
+          if (li.classList.contains('collapsed')) {
+            li.classList.remove('collapsed');
+            icon.style.transform = "rotate(90deg)";
+          } else {
+            li.classList.add('collapsed');
+            icon.style.transform = "rotate(0deg)";
+          }
+        });
+      });
+    }
+
+    function ativarPropagacao() {
+      document.getElementById('tree').addEventListener('change', (e) => {
+        if (!e.target.classList.contains('menu-checkbox')) return;
+
+        const li = e.target.closest('li');
+        li.querySelectorAll('ul .menu-checkbox').forEach(cb => cb.checked = e.target.checked);
+      });
+    }
+
+    function marcarTodos(v) {
+      document.querySelectorAll('.menu-checkbox').forEach(cb => cb.checked = v);
+    }
+
+    function expandirTodos(v) {
+      document.querySelectorAll('#tree li').forEach(li => {
+        const icon = li.querySelector('.arrow-icon');
+        const hasChildren = li.querySelector(':scope > ul')?.children.length;
+
+        if (!hasChildren) return;
+
+        if (v) {
+          li.classList.remove('collapsed');
+          icon.style.transform = "rotate(90deg)";
+        } else {
+          li.classList.add('collapsed');
+          icon.style.transform = "rotate(0deg)";
+        }
+      });
+    }
+
+
+function exportarHTML() {
+  const container = document.querySelector(".card").cloneNode(true);
+
+  container.querySelectorAll(".btn-pill, .btn-primary, .btn-secondary")
+           .forEach(btn => btn.remove());
+
+  container.querySelectorAll("ul").forEach(ul => ul.style.display = "block");
+  container.querySelectorAll(".arrow-icon").forEach(icon => {
+    icon.style.transform = "rotate(90deg)";
+  });
+
+  container.querySelectorAll("li").forEach(li => {
+    const ul = li.querySelector(':scope > ul');
+    if (ul && ul.children.length > 0) {
+      li.classList.add('collapsed-export'); 
+    }
+  });
+
+  container.querySelectorAll(".menu-checkbox").forEach(cb => {
+    if (cb.checked) cb.setAttribute("checked", "checked");
+    cb.setAttribute("disabled", "disabled");
+  });
+
+  let htmlFinal = "";
+  htmlFinal += "<!DOCTYPE html>";
+  htmlFinal += "<html lang='pt-BR'>";
+  htmlFinal += "<head>";
+  htmlFinal += "<meta charset='UTF-8'>";
+  htmlFinal += "<title>Permissões Exportadas</title>";
+  htmlFinal += "<style>";
+  htmlFinal += "body{font-family:system-ui,Arial;background:#f3f4f6;padding:20px;}";
+  htmlFinal += ".card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:20px;max-width:900px;margin:auto;}";
+  htmlFinal += ".tree-line{display:flex;align-items:center;gap:6px;margin:4px 0;}";
+  htmlFinal += ".menu-checkbox{width:14px;height:14px;border:1px solid #666;border-radius:3px;}";
+  htmlFinal += ".menu-checkbox:checked{background:#0C6C94;border-color:#0C6C94;}";
+  htmlFinal += "ul{margin-left:20px;list-style:none;}";
+  htmlFinal += ".toggle-arrow{cursor:pointer;}";
+  htmlFinal += ".arrow-icon{width:12px;transition:0.2s;}";
+  htmlFinal += ".collapsed-export > ul { display: none; }"; 
+  htmlFinal += "</style>";
+  htmlFinal += "</head>";
+  htmlFinal += "<body>";
+
+  htmlFinal += "<h2 style='text-align:center;color:#0C6C94;'>Permissões exportadas</h2>";
+
+
+  const perfil = localStorage.getItem("perfilEscolhido") || "Não informado";
+  htmlFinal += `<h3 style='text-align:center;margin-top:10px;color:#333;'>Perfil configurado: <strong>${perfil}</strong></h3>`;
+
+
+  htmlFinal += container.innerHTML;
+
+  htmlFinal += "<script>";
+  htmlFinal += "document.querySelectorAll('.toggle-arrow').forEach(function(arrow){";
+  htmlFinal += "  arrow.addEventListener('click', function(){";
+  htmlFinal += "    var li = arrow.closest('li');";
+  htmlFinal += "    var ul = li.querySelector(':scope > ul');";
+  htmlFinal += "    var icon = arrow.querySelector('.arrow-icon');";
+  htmlFinal += "    if(!ul) return;";
+  htmlFinal += "    if(li.classList.contains('collapsed-export')){";
+  htmlFinal += "      li.classList.remove('collapsed-export');";
+  htmlFinal += "      icon.style.transform = 'rotate(90deg)';";
+  htmlFinal += "    } else {";
+  htmlFinal += "      li.classList.add('collapsed-export');";
+  htmlFinal += "      icon.style.transform = 'rotate(0deg)';";
+  htmlFinal += "    }";
+  htmlFinal += "  });";
+  htmlFinal += "});";
+  htmlFinal += "<\\/script>";
+
+  htmlFinal += "</body></html>";
+
+  const blob = new Blob([htmlFinal], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "permissoes_exportadas.html";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+
+    document.addEventListener('DOMContentLoaded', construirArvoreMenus);
+  </script>
+
+</body>
+</html>

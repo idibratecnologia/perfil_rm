@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Árvore de Menus TOTVS RM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f3f4f6;
+      color: #111827;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-bar {
+      background: #0C6C94;
+      color: #fff;
+      width: 100%;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .page-wrapper {
+      flex: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 20px auto 80px auto;
+      padding: 0 12px;
+    }
+
+    .subtitle {
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(15,23,42,0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e5e7eb;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      font-size: 0.8rem;
+      color: #374151;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+
+    .btn-pill:hover {
+      background: #eef2ff;
+      box-shadow: 0 1px 4px rgba(15,23,42,0.18);
+      transform: translateY(-1px);
+    }
+
+    .tree-container {
+      padding: 16px 20px;
+      font-size: 0.9rem;
+      max-height: calc(100vh - 210px);
+      overflow: auto;
+      scrollbar-width: thin;
+    }
+
+    .tree-container ul {
+      list-style: none;
+      margin-left: 22px;
+    }
+
+    .tree-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 0;
+    }
+
+    .toggle-arrow {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      color: #4b5563;
+    }
+
+    .arrow-icon {
+      width: 14px;
+      height: 14px;
+      display: block;
+      transition: transform 0.18s ease;
+    }
+
+    .collapsed > ul {
+      display: none;
+    }
+
+    .menu-checkbox {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1px solid #9ca3af;
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+      background: #ffffff;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .menu-checkbox:checked {
+      background: #0C6C94;
+      border-color: #0C6C94;
+      box-shadow: 0 0 0 2px rgba(12,108,148,0.25);
+    }
+
+    .menu-checkbox:checked::after {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 1px;
+      width: 4px;
+      height: 8px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+
+    .footer-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(243,244,246,0.95);
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: center;
+      padding: 8px 12px;
+      backdrop-filter: blur(6px);
+    }
+
+    .footer-buttons {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .footer-buttons button {
+      padding: 9px 20px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+
+    .btn-primary {
+      background: #0C6C94;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-bar">Selecione as permissões do módulo</div>
+
+  <main class="page-wrapper">
+    <p class="subtitle">Marque os menus desejados para este perfil.</p>
+    <p class="hint">Dica: clique na seta para expandir/recolher os níveis da árvore.</p>
+
+    <section class="card">
+      <header class="card-header">
+        <div class="card-title">Árvore de menus TOTVS RM</div>
+        <div class="card-actions">
+          <button class="btn-pill" onclick="expandirTodos(true)">▾ Expandir tudo</button>
+          <button class="btn-pill" onclick="expandirTodos(false)">▸ Recolher tudo</button>
+        </div>
+      </header>
+
+      <div id="tree" class="tree-container"></div>
+    </section>
+  </main>
+
+  <div class="footer-bar">
+    <div class="footer-buttons">
+      <button class="btn-secondary" onclick="marcarTodos(false)">Desmarcar todos</button>
+      <button class="btn-primary" onclick="marcarTodos(true)">Marcar todos</button>
+      <button class="btn-primary" onclick="exportarHTML()">Exportar HTML</button>
+    </div>
+  </div>
+
+  <script type="text/plain" id="raw-menus">
+[01] Venda
+    [01.01] Contratos
+        [01.01.01] Contratos de Venda
+            [01.01.01.01] Contratos: Incluir
+            [01.01.01.02] Contratos: Excluir
+            [01.01.01.03] Contratos: Editar
+            [01.01.01.04] Contratos: Efetivar
+            [01.01.01.05] Contratos: Bloquear
+            [01.01.01.06] Contratos: Voltar Situação
+            [01.01.01.07] Contratos: Quitar
+            [01.01.01.08] Contratos: Gerar Lançamentos
+            [01.01.01.09] Contratos: Atualizar Data Reajuste
+            [01.01.01.10] Contratos: Atualizar Valor Sumarizado da Venda
+            [01.01.01.11] Contratos: Pendências Contrato
+            [01.01.01.12] Contratos: Gerar Parcela Resíduo
+            [01.01.01.13] Contratos: Fiadores
+            [01.01.01.14] Contratos: Calcular Saldo Devedor
+            [01.01.01.15] Contratos: Gerar Seguro Por Empreendimento
+            [01.01.01.16] Contratos: Gerar Parcela de IPTU
+            [01.01.01.17] Contratos: Cancelar Parcela de IPTU
+            [01.01.01.18] Contratos: Copiar Contrato
+            [01.01.01.19] Alteração Global da Condição de Financiamento
+            [01.01.01.20] Alteração Global do Cadastro da Venda
+            [01.01.01.21] Contratos: Gerar Contratos
+            [01.01.01.22] Contratos: Cancelar
+            [01.01.01.23] Contratos: Contabilizar Entrega Chaves
+            [01.01.01.24] Contratos: Excluir Contabilidade Entrega de Chaves
+            [01.01.01.25] Contratos: Simulador de Reajuste por Formula da Parcela
+            [01.01.01.26] Contratos: Geração de boleto automática
+            [01.01.01.27] Contratos: Solicitação atendimento de entrega das chaves
+
+        [01.01.02] Contratos de Venda - Parte 2
+            [01.01.02.01] Contratos: Plano De Financiamento
+            [01.01.02.02] Contratos: Gerar Plano Financiamento
+            [01.01.02.03] Contratos: Excluir Plano Financiamento
+            [01.01.02.04] Contratos: Documentos - Visualizar
+            [01.01.02.05] Contratos: Documentos - Editar
+            [01.01.02.06] Contratos: Documentos - Inserir
+            [01.01.02.07] Contratos: Documentos - Excluir
+            [01.01.02.08] Contratos: Consultar Operação Contábil da Venda
+            [01.01.02.09] Contratos: Consultar Operação Contábil da Entrega de Chaves
+            [01.01.02.10] Contratos: Contabilidade - Permitir trocar evento contábil ao efetivar venda
+            [01.01.02.11] Contratos: Cobertura de Garantia - Visualizar
+            [01.01.02.12] Contratos: Cobertura de Garantia - Incluir
+            [01.01.02.13] Contratos: Cobertura de Garantia - Excluir
+            [01.01.02.14] Contratos: Cobertura de Garantia - Editar
+            [01.01.02.15] Contratos: Condições de Financiamento: Visualizar
+            [01.01.02.16] Contratos: Condições de Financiamento: Incluir
+            [01.01.02.17] Contratos: Condições de Financiamento: Editar
+            [01.01.02.18] Contratos: Condições de Financiamento: Excluir
+            [01.01.02.19] Contratos: Condições de Financiamento: Copiar Grupo
+            [01.01.02.20] Contratos: Condições de Financiamento: Copiar Modalidade
+            [01.01.02.21] Contratos: Movimento de Brinde
+            [01.01.02.22] Contratos: Movimento de Venda
+            [01.01.02.23] Contratos: Movimento - Cancelar
+            [01.01.02.24] Contratos: Movimento(s) Gerado(s)
+            [01.01.02.25] Contratos: Movimento de Adiantamento
+            [01.01.02.26] Contratos: Log da Venda
+            [01.01.02.27] Contratos: Log do Item da Venda
+            [01.01.02.28] Contratos: Log da Regra da Venda
+
+        [01.01.03] Compradores
+            [01.01.03.01] Compradores: Visualizar
+            [01.01.03.02] Compradores: Incluir
+            [01.01.03.03] Compradores: Excluir
+            [01.01.03.04] Compradores: Editar
+            [01.01.03.05] Compradores: Log do Comprador
+
+        [01.01.04] Vendedores
+            [01.01.04.01] Vendedores: Visualizar
+            [01.01.04.02] Vendedores: Incluir
+            [01.01.04.03] Vendedores: Excluir
+            [01.01.04.04] Vendedores: Editar
+            [01.01.04.05] Vendedores: Log do Vendedor
+
+        [01.01.05] Comissões
+            [01.01.05.01] Comissões: Visualizar
+            [01.01.05.02] Comissões: Incluir
+            [01.01.05.03] Comissões: Excluir
+            [01.01.05.04] Comissões: Editar
+            [01.01.05.05] Comissões: Log de Comissão
+            [01.01.05.06] Comissões: Recalcular Comissão
+            [01.01.05.07] Comissões: Gerar Movimento Comissão
+            [01.01.05.08] Comissões: Excluir Movimento Comissão
+            [01.01.05.09] Comissões: Atualizar Competência Comissão(ões)
+            [01.01.05.10] Comissões: Gerar Parcela
+            [01.01.05.11] Comissões: Excluir Parcela
+
+        [01.01.06] Modelos
+            [01.01.06.01] Modelos de Contratos: Incluir
+            [01.01.06.02] Modelos de Contratos: Excluir
+            [01.01.06.03] Modelos de Contratos: Editar
+
+        [01.01.07] Plano
+            [01.01.07.01] Modalidades
+                [01.01.07.01.01] Modalidades: Visualizar
+                [01.01.07.01.02] Modalidades: Incluir
+                [01.01.07.01.03] Modalidades: Excluir
+                [01.01.07.01.04] Modalidades: Editar
+                [01.01.07.01.05] Modalidades: Cópia de Modalidade por Coligada
+                [01.01.07.01.06] Condição de Financiamento: Visualizar
+                [01.01.07.01.07] Condição de Financiamento: Incluir
+                [01.01.07.01.08] Condição de Financiamento: Excluir
+                [01.01.07.01.09] Condição de Financiamento: Editar
+                [01.01.07.01.10] Evento Contábil: Visualizar
+                [01.01.07.01.11] Evento Contábil: Incluir
+                [01.01.07.01.12] Evento Contábil: Excluir
+                [01.01.07.01.13] Evento Contábil: Editar
+                [01.01.07.01.14] Valor Tipo Parcela: Visualizar
+                [01.01.07.01.15] Valor Tipo Parcela: Incluir
+                [01.01.07.01.16] Valor Tipo Parcela: Excluir
+                [01.01.07.01.17] Valor Tipo Parcela: Editar
+
+            [01.01.07.02] Tipos de Componentes
+                [01.01.07.02.01] Tipos de Componentes: Incluir
+                [01.01.07.02.02] Tipos de Componentes: Excluir
+                [01.01.07.02.03] Tipos de Componentes: Editar
+
+            [01.01.07.03] Componentes
+                [01.01.07.03.01] Componentes: Incluir
+                [01.01.07.03.02] Componentes: Excluir
+                [01.01.07.03.03] Componentes: Editar
+
+            [01.01.07.04] Tipos de Parcelas
+                [01.01.07.04.01] Tipos de Parcelas: Incluir
+                [01.01.07.04.02] Tipos de Parcelas: Excluir
+                [01.01.07.04.03] Tipos de Parcelas: Editar
+                [01.01.07.04.04] Tipos de Parcelas: Parametros das Parcelas
+
+            [01.01.07.05] Tipos de Receitas
+                [01.01.07.05.01] Tipos de Receitas: Incluir
+                [01.01.07.05.02] Tipos de Receitas: Excluir
+                [01.01.07.05.03] Tipos de Receitas: Editar
+                [01.01.07.05.04] Tipos de Receitas: Tabelas Opcionais para o Tipo de Receita
+
+            [01.01.07.06] Valores de Integração
+                [01.01.07.06.01] Valores de Integração: Incluir
+                [01.01.07.06.02] Valores de Integração: Excluir
+                [01.01.07.06.03] Valores de Integração: Editar
+
+        [01.01.15] Reajuste
+
+        [01.01.16] Aditivos de Venda
+            [01.01.16.02] Aditivo: Visualizar
+            [01.01.16.03] Aditivo: Incluir
+            [01.01.16.04] Aditivo: Excluir
+            [01.01.16.05] Aditivo: Editar
+            [01.01.16.06] Alteração de Valor: Visualizar
+            [01.01.16.07] Alteração de Valor: Incluir
+            [01.01.16.08] Alteração de Valor: Excluir
+            [01.01.16.09] Alteração de Valor: Editar
+            [01.01.16.10] Alteração Vencimento: Visualizar
+            [01.01.16.11] Alteração Vencimento: Incluir
+            [01.01.16.12] Alteração Vencimento: Excluir
+            [01.01.16.13] Alteração Vencimento: Editar
+            [01.01.16.14] Fiador: Visualizar
+            [01.01.16.15] Fiador: Incluir
+            [01.01.16.16] Fiador: Excluir
+            [01.01.16.17] Fiador: Editar
+            [01.01.16.18] Outros: Visualizar
+            [01.01.16.19] Outros: Incluir
+            [01.01.16.20] Outros: Excluir
+            [01.01.16.21] Outros: Editar
+            [01.01.16.22] Troca Comprador: Visualizar
+            [01.01.16.23] Troca Comprador: Incluir
+            [01.01.16.24] Troca Comprador: Excluir
+            [01.01.16.25] Troca Comprador: Editar
+
+        [01.01.18] Aditivos de Venda - Parte 2
+            [01.01.18.01] Aditivo: Efetivar
+            [01.01.18.02] Aditivo: Desfazer
+            [01.01.18.03] Aditivo: Cancelar
+            [01.01.18.04] Aditivo: Contabilizar
+            [01.01.18.05] Aditivo: Excluir/EstornarContabilizar
+            [01.01.18.06] Aditivo: Contabilizar - Permitir trocar evento contábil ao efetivar aditivo
+            [01.01.18.07] Renegociação: Visualizar
+            [01.01.18.08] Renegociação: Incluir
+            [01.01.18.09] Renegociação: Excluir
+            [01.01.18.10] Renegociação: Editar
+            [01.01.18.11] Renegociação: Permitir alterar comportamento do resíduo
+            [01.01.18.12] Renegociação: Permitir alterar valor resíduo pendente
+            [01.01.18.13] Renegociação: Permite Negociar Valores Diferentes
+            [01.01.18.14] Renegociação: Condições de Financiamento: Visualizar
+            [01.01.18.15] Renegociação: Condições de Financiamento: Incluir
+            [01.01.18.16] Renegociação: Condições de Financiamento: Editar
+            [01.01.18.17] Renegociação: Condições de Financiamento: Excluir
+            [01.01.18.18] Renegociação: Condições de Financiamento: Copiar Grupo
+            [01.01.18.19] Renegociação: Condições de Financiamento: Copiar Modalidade
+            [01.01.18.20] Renegociação: Condições de Financiamento: Gerar Plano
+            [01.01.18.21] Renegociação: Condições de Financiamento: Excluir Plano
+            [01.01.18.22] Renegociação: Condições de Financiamento: Limpar Condição
+            [01.01.18.23] Troca Subunidade: Visualizar
+            [01.01.18.24] Troca Subunidade: Incluir
+            [01.01.18.25] Troca Subunidade: Excluir
+            [01.01.18.26] Troca Subunidade: Editar
+            [01.01.18.27] Alteração de Valor: Global
+            [01.01.18.28] Renegociador: Global
+
+        [01.01.19] Distratos de Venda
+            [01.01.19.01] Distrato: Visualizar
+            [01.01.19.02] Distrato: Incluir
+            [01.01.19.03] Distrato: Excluir
+            [01.01.19.04] Distrato: Editar
+            [01.01.19.05] Distrato: Efetivar
+            [01.01.19.06] Distrato: Desfazer Efetivar
+            [01.01.19.07] Distrato: Quitar
+            [01.01.19.08] Distrato: Cancelar
+            [01.01.19.09] Distrato: Contabilizar
+            [01.01.19.10] Distrato: Desfazer Contabilizar
+            [01.01.19.11] Distrato: Contabilizar - Permitir trocar evento contábil ao efetivar distrato
+            [01.01.19.12] Distrato: Alteração Global
+            [01.01.19.13] Distrato: Condições de Financiamento: Visualizar
+            [01.01.19.14] Distrato: Condições de Financiamento: Incluir
+            [01.01.19.15] Distrato: Condições de Financiamento: Editar
+            [01.01.19.16] Distrato: Condições de Financiamento: Excluir
+            [01.01.19.17] Distrato: Condições de Financiamento: Copiar Modalidade
+            [01.01.19.18] Distrato: Condições de Financiamento: Gerar Plano
+            [01.01.19.19] Distrato: Condições de Financiamento: Excluir Plano
+            [01.01.19.20] Distrato: Condições de Financiamento: Limpar Condição
+
+        [01.01.20] Movimentos RPS
+        [01.01.21] Gerar movimento de RPS
+        [01.01.22] Excluir movimento de RPS
+
+        [01.01.23] Valor de dedução do RPS
+            [01.01.23.01] Valor de dedução do RPS: Incluir
+            [01.01.23.02] Valor de dedução do RPS: Excluir
+            [01.01.23.03] Valor de dedução do RPS: Editar
+
+        [01.01.24] Minha Casa Minha Vida
+            [01.01.24.01] Alteração Plano de Financiamento
+            [01.01.24.02] Atualização Plano de Financiamento
+            [01.01.24.03] Baixas por Demonstrativo de Cronograma Desembolso
+
+    [01.02] Manutenção de Empreendimentos
+        [01.02.01] Empreendimento
+            [01.02.01.01] Empreendimento: Incluir
+            [01.02.01.02] Empreendimento: Excluir
+            [01.02.01.03] Empreendimento: Editar
+            [01.02.01.04] Empreendimento: Característica
+            [01.02.01.05] Empreendimento: Modalidades
+            [01.02.01.06] Empreendimento: IPTU Anual do Empreendimento
+            [01.02.01.07] Empreendimento: Histórico Alteração Data Entrega / Habite-se
+            [01.02.01.08] Empreendimento: Copiar PIS/COFINS
+            [01.02.01.09] Empreendimento: Calcula Seguro por Empreendimento
+            [01.02.01.10] Empreendimento: Troca Data de Entrega
+            [01.02.01.11] Empreendimento: Repasse
+            [01.02.01.12] Empreendimento: Regra 963
+            [01.02.01.13] Empreendimento: Rateio Departamento
+            [01.02.01.14] Empreendimento: Rateio Centro de Custo
+            [01.02.01.15] Empreendimento: Conselho Administrativo
+            [01.02.01.16] Empreendimento: Participantes do Conselho Administrativo
+            [01.02.01.17] Empreendimento: Associar Medidor
+            [01.02.01.18] Empreendimento: Associação de Cobrança por Orçamento - Visualizar
+            [01.02.01.19] Empreendimento: Associação de Cobrança por Orçamento - Incluir
+            [01.02.01.20] Empreendimento: Associação de Cobrança por Orçamento - Excluir
+            [01.02.01.21] Empreendimento: Associação de Cobrança por Orçamento - Editar
+            [01.02.01.22] Empreendimento: Gerar imóvel(is) para aluguel
+            [01.02.01.23] Empreendimento: TAE Assinantes automático
+            [01.02.01.24] Empreendimento: Alterar valor fixo
+            [01.02.01.25] Integrar com Registradora
+
+        [01.02.02] Unidade / Subunidade
+            [01.02.02.01] Unidade / Sub-Unidade: Incluir
+            [01.02.02.02] Unidade / Sub-Unidade: Excluir
+            [01.02.02.03] Unidade / Sub-Unidade: Editar
+            [01.02.02.04] Unidade / Sub-Unidade: Rateio de Centro de Custo por Subunidade
+            [01.02.02.05] CRD (Coeficiente de Rateio de Despesa)
+            [01.02.02.06] Reserva de Áreas Comuns - Incluir
+            [01.02.02.07] Reserva de Áreas Comuns - Excluir
+            [01.02.02.08] Reserva de Áreas Comuns - Editar
+
+        [01.02.03] Situação Subunidade
+            [01.02.03.01] Situação da Sub-Unidade: Incluir
+            [01.02.03.02] Situação da Sub-Unidade: Excluir
+            [01.02.03.03] Situação da Sub-Unidade: Editar
+
+        [01.02.04] Tabela de Preço
+            [01.02.04.01] Tabela de Preço: Visualizar
+            [01.02.04.02] Tabela de Preço: Incluir
+            [01.02.04.03] Tabela de Preço: Excluir
+            [01.02.04.04] Tabela de Preço: Editar
+            [01.02.04.05] Tabela de Preço: Gerar Preço
+                [01.02.04.05.01] Tabela de Preço: Gerar Preço Permite Efetivar Automaticamente
+            [01.02.04.06] Tabela de Preço: Efetivar
+            [01.02.04.07] Tabela de Preço: Reajustar
+                [01.02.04.07.01] Tabela de Preço: Reajustar Permite Efetivar Automaticamente
+            [01.02.04.08] Tabela de Preço: Cancelar
+            [01.02.04.09] Tabela de Preço: Importar Planilha
+            [01.02.04.10] Preço: Visualizar
+            [01.02.04.11] Preço: Incluir
+            [01.02.04.12] Preço: Excluir
+            [01.02.04.13] Preço: Editar
+
+        [01.02.05] Tipos de Características
+            [01.02.05.01] Tipos de Características: Incluir
+            [01.02.05.02] Tipos de Características: Excluir
+            [01.02.05.03] Tipos de Características: Editar
+
+        [01.02.06] Características
+            [01.02.06.01] Características: Incluir
+            [01.02.06.02] Características: Excluir
+            [01.02.06.03] Características: Editar
+
+        [01.02.07] Modelo de Subunidade
+            [01.02.07.01] Modelo Subunidade: Incluir
+            [01.02.07.02] Modelo Subunidade: Excluir
+            [01.02.07.03] Modelo Subunidade: Editar
+
+        [01.02.08] Despesas
+            [01.02.08.01] Despesa de Venda
+                [01.02.08.01.01] Despesa de Venda: Visualizar
+                [01.02.08.01.02] Despesa de Venda: Incluir
+                [01.02.08.01.03] Despesa de Venda: Editar
+                [01.02.08.01.04] Despesa de Venda: Excluir
+                [01.02.08.01.05] Despesa de Venda: Gerar Movimento
+                [01.02.08.01.06] Despesa de Venda: Gerar Financeiro
+                [01.02.08.01.07] Despesa de Venda: Cancelar Integração
+                [01.02.08.01.08] Despesa de Venda: Regerar Integração
+
+            [01.02.08.02] Definição de Despesa
+                [01.02.08.02.01] Definição de Despesa: Visualizar
+                [01.02.08.02.02] Definição de Despesa: Incluir
+                [01.02.08.02.03] Definição de Despesa: Editar
+                [01.02.08.02.04] Definição de Despesa: Excluir
+                [01.02.08.02.05] Definição de Despesa: Gerar Despesa
+
+            [01.02.08.03] Tipo de Despesa
+                [01.02.08.03.01] Tipo de Despesa: Visualizar
+                [01.02.08.03.02] Tipo de Despesa: Incluir
+                [01.02.08.03.03] Tipo de Despesa: Editar
+                [01.02.08.03.04] Tipo de Despesa: Excluir
+
+            [01.02.08.04] Regra de Reembolso
+                [01.02.08.04.01] Regra Reembolso: Visualizar
+                [01.02.08.04.02] Regra Reembolso: Incluir
+                [01.02.08.04.03] Regra Reembolso: Editar
+                [01.02.08.04.04] Regra Reembolso: Excluir
+
+        [01.02.13] Documentos do Empreendimento
+            [01.02.13.01] Documentos: Visualizar
+            [01.02.13.02] Documentos: Inserir
+            [01.02.13.03] Documentos: Editar
+            [01.02.13.04] Documentos: Excluir
+
+    [01.03] Cadastros
+        [01.03.01] Básicos
+            [01.03.01.01] Clientes
+                [01.03.01.01.01] Dados Adicionais (SGI)
+                [01.03.01.01.02] Cônjuge
+            [01.03.01.02] Filiais
+            [01.03.01.03] Departamento
+            [01.03.01.04] Centros de Custos
+            [01.03.01.05] Classificação Centro de Custos
+            [01.03.01.06] Moedas e Índices
+            [01.03.01.07] Cotações
+            [01.03.01.08] Países
+            [01.03.01.09] Estados
+            [01.03.01.10] Bancos e Agências
+                [01.03.01.10.01] Incluir Bancos e Agências
+                [01.03.01.10.02] Excluir Bancos e Agências
+                [01.03.01.10.03] Editar Bancos e Agências
+                [01.03.01.10.04] Incluir Layout Registro Online
+                [01.03.01.10.05] Excluir Layout Registro Online
+                [01.03.01.10.06] Editar Layout Registro Online
+            [01.03.01.11] Calendários
+                [01.03.01.11.01] Incluir Calendários e Feriados
+                [01.03.01.11.02] Excluir Calendários e Feriados
+                [01.03.01.11.03] Editar Calendários e Feriados
+            [01.03.01.12] Parâmetros Movimento
+            [01.03.01.13] Parâmetros de Integração Financeira para Venda
+                [01.03.01.13.01] Inserir
+                [01.03.01.13.02] Editar
+                [01.03.01.13.03] Excluir
+
+        [01.03.15] Gerais
+            [01.03.15.01] Regime de Casamento
+                [01.03.15.01.01] Regime de Casamento: Incluir
+                [01.03.15.01.02] Regime de Casamento: Excluir
+                [01.03.15.01.03] Regime de Casamento: Editar
+            [01.03.15.02] Tipos de Endereço
+                [01.03.15.02.01] Tipos de Endereço: Incluir
+                [01.03.15.02.02] Tipos de Endereço: Excluir
+                [01.03.15.02.03] Tipos de Endereço: Editar
+            [01.03.15.03] Estado Civil
+                [01.03.15.03.01] Estado Civil: Incluir
+                [01.03.15.03.02] Estado Civil: Excluir
+                [01.03.15.03.03] Estado Civil: Editar
+            [01.03.15.04] Profissões
+                [01.03.15.04.01] Profissões: Incluir
+                [01.03.15.04.02] Profissões: Excluir
+                [01.03.15.04.03] Profissões: Editar
+            [01.03.15.05] Tipos de Bens
+                [01.03.15.05.01] Tipos de Bens: Incluir
+                [01.03.15.05.02] Tipos de Bens: Excluir
+                [01.03.15.05.03] Tipos de Bens: Editar
+            [01.03.15.06] Bens
+                [01.03.15.06.01] Bens: Incluir
+                [01.03.15.06.02] Bens: Excluir
+                [01.03.15.06.03] Bens: Editar
+            [01.03.15.07] Regiões
+                [01.03.15.07.01] Regiões: Incluir
+                [01.03.15.07.02] Regiões: Excluir
+                [01.03.15.07.03] Regiões: Editar
+            [01.03.15.08] Cartórios
+                [01.03.15.08.01] Cartórios: Incluir
+                [01.03.15.08.02] Cartórios: Excluir
+                [01.03.15.08.03] Cartórios: Editar
+            [01.03.15.09] Precisão Moeda
+                [01.03.15.09.01] Precisão Moeda: Incluir
+                [01.03.15.09.02] Precisão Moeda: Excluir
+                [01.03.15.09.03] Precisão Moeda: Editar
+            [01.03.15.10] Fiador Pessoa Física
+                [01.03.15.10.01] Fiador Pessoa Física: Incluir
+                [01.03.15.10.02] Fiador Pessoa Física: Excluir
+                [01.03.15.10.03] Fiador Pessoa Física: Editar
+            [01.03.15.11] Fiador Pessoa Jurídica
+                [01.03.15.11.01] Fiador Pessoa Jurídica: Incluir
+                [01.03.15.11.02] Fiador Pessoa Jurídica: Excluir
+                [01.03.15.11.03] Fiador Pessoa Jurídica: Editar
+            [01.03.15.12] Situações da Venda e Motivos de Cancelamento
+                [01.03.15.12.01] Situações da Venda e Motivos de Cancelamento: Editar
+            [01.03.15.13] Tabelas de Texto
+                [01.03.15.13.01] Tabelas de Texto: Incluir
+                [01.03.15.13.02] Tabelas de Texto: Excluir
+                [01.03.15.13.03] Tabelas de Texto: Editar
+            [01.03.15.14] Dados Bancários
+                [01.03.15.14.01] Dados Bancários: Incluir
+                [01.03.15.14.02] Dados Bancários: Excluir
+                [01.03.15.14.03] Dados Bancários: Editar
+                [01.03.15.14.04] Gerenciamento de Relatório Web: Filtro Implícito
+                [01.03.15.14.05] Gerenciamento de Relatório Web: Perfil de acesso
+            [01.03.15.15] Tipos de Distratos
+                [01.03.15.15.01] Tipos de Distratos: Visualizar
+            [01.03.15.16] Motivos de Distratos
+                [01.03.15.16.01] Motivos de Distratos: Visualizar
+                [01.03.15.16.02] Motivos de Distratos: Incluir
+                [01.03.15.16.03] Motivos de Distratos: Excluir
+                [01.03.15.16.04] Motivos de Distratos: Editar
+
+        [01.03.33] Campos Complementares
+            [01.03.33.01] Empreeendimento
+            [01.03.33.02] Unidade
+            [01.03.33.03] Sub-unidade
+            [01.03.33.04] Venda
+            [01.03.33.05] Distrato
+            [01.03.33.06] Compradores
+            [01.03.33.07] Vendedores
+            [01.03.33.08] Comissão
+
+    [01.04] Relatórios
+        [01.04.01] Relatórios
+            [01.04.01.01] Empreendimento
+            [01.04.01.02] Vendas Canceladas
+            [01.04.01.03] Ficha Financeira
+            [01.04.01.04] Vendedor
+            [01.04.01.05] Notas Promissórias
+            [01.04.01.06] Geral
+            [01.04.01.07] Tabela de preço
+            [01.04.01.08] DIMOB
+
+[02] Aluguel
+    [02.01] Imóveis
+        [02.01.01] Template de Busca Imóveis
+            [02.01.01.01] Template: Incluir
+            [02.01.01.02] Template: Excluir
+            [02.01.01.03] Template: Editar
+        [02.01.02] Busca de Imóveis
+        [02.01.03] Imóvel: Incluir
+        [02.01.04] Imóvel: Excluir
+        [02.01.05] Imóvel: Editar
+        [02.01.06] Imóvel: Administradoras
+        [02.01.07] Imóvel: Características
+        [02.01.08] Imóvel: Prestadoras
+        [02.01.09] Imóvel: Alterar Situação
+        [02.01.10] Imóvel: Histórico
+        [02.01.11] Imóvel: Gerar sub-Unidade a partir do imóvel
+        [02.01.12] Imóvel: Matrículas
+        [02.01.13] Imóvel: Imagens
+        [02.01.14] Imóvel: Inscrição Municipal
+        [02.01.15] Histórico da inscrição municipal
+        [02.01.16] Imóvel: Alterar dados da inscrição municipal
+        [02.01.17] Imóvel: Lançamento Financeiro
+        [02.01.18] Imóvel: Movimentos
+        [02.01.19] Imóvel: Período de Indisponibilidade
+        [02.01.20] Imóvel: Gerar Período de Indisponibilidade
+
+    [02.02] Contratos de Administração
+        [02.02.01] Contrato de Administração
+            [02.02.01.01] Contrato de Administração de Imóvel: Incluir
+            [02.02.01.02] Contrato de Administração de Imóvel: Excluir
+            [02.02.01.03] Contrato de Administração de Imóvel: Editar
+            [02.02.01.04] Imóveis
+            [02.02.01.05] Locadores
+            [02.02.01.06] Efetivar
+            [02.02.01.07] Imprimir
+            [02.02.01.08] Rescindir
+            [02.02.01.09] Reabrir
+            [02.02.01.10] Histórico
+            [02.02.01.11] Gerar Movimento Administração Aluguel
+            [02.02.01.12] Cancelar Movimentos de Aluguel
+        [02.02.02] Aditivos
+            [02.02.02.01] Aditivo de alteração do valor sugerido
+            [02.02.02.02] Efetivar aditivo de alteração do valor sugerido
+            [02.02.02.03] Desfazer aditivo de alteração do valor sugerido
+            [02.02.02.04] Aditivo de renegociação
+            [02.02.02.05] Efetivar aditivo de renegociação de taxas
+            [02.02.02.06] Desfazer aditivo de renegociação de taxas
+            [02.02.02.07] Aditivo de prorrogação do contrato de administração
+            [02.02.02.08] Efetivar aditivo de prorrogação do contrato de administração
+            [02.02.02.09] Desfazer aditivo de prorrogação do contrato de administração
+            [02.02.02.10] Aditivo de alteração de locador
+            [02.02.02.11] Efetivar Aditivo de alteração de locador
+            [02.02.02.12] Desfazer Aditivo de alteração de locador
+            [02.02.02.13] Aditivo de alteração de beneficiário
+            [02.02.02.14] Efetivar aditivo de alteração de beneficiário
+            [02.02.02.15] Desfazer aditivo de alteração de beneficiário
+            [02.02.02.16] Aditivo de troca de procurador
+            [02.02.02.17] Efetivar aditivo de troca de procurador
+            [02.02.02.18] Desfazer aditivo de troca de procurador
+            [02.02.02.19] Aditivo de troca de imóvel
+            [02.02.02.20] Efetivar aditivo de troca de imóvel
+            [02.02.02.21] Desfazer aditivo de troca de imóvel
+
+    [02.03] Contrato de Locação
+        [02.03.01] Contrato de Locação
+            [02.03.01.02] Incluir
+            [02.03.01.03] Excluir
+            [02.03.01.04] Editar
+            [02.03.01.05] Reajustes Vigentes
+            [02.03.01.06] Histórico de Reajustes
+            [02.03.01.07] Lista de Encerramento
+            [02.03.01.08] Efetivar
+            [02.03.01.09] Encerrar
+            [02.03.01.10] Gerar Lançamento
+            [02.03.01.11] Imprimir
+            [02.03.01.12] Corretores
+            [02.03.01.13] Fiadores
+            [02.03.01.14] Garantias
+            [02.03.01.15] Imóveis
+            [02.03.01.16] Locatários
+            [02.03.01.17] Lançamentos
+            [02.03.01.18] Reabrir
+            [02.03.01.19] Histórico
+            [02.03.01.20] Escalonamento
+            [02.03.01.21] Efetivar Escalonamento
+            [02.03.01.22] Reabrir Escalonamento
+            [02.03.01.23] Cancelar Escalonamento
+            [02.03.01.24] Imprimir Lista de Pendências para Encerramento
+            [02.03.01.25] Imprimir Rescisão Contrato de Locação
+            [02.03.01.26] Ocupação de Área do Imóvel
+            [02.03.01.27] Aluguel em Dobro
+            [02.03.01.28] Prorrogar contrato por tempo indeterminado
+            [02.03.01.29] Multa
+        [02.03.03] Aditivos
+            [02.03.03.01] Aditivo de alteração de garantias do contrato
+                [02.03.03.01.01] Visualizar
+                [02.03.03.01.02] Inserir
+                [02.03.03.01.03] Excluir
+                [02.03.03.01.04] Editar
+                [02.03.03.01.05] Efetivar aditivo
+                [02.03.03.01.06] Desfazer aditivo
+            [02.03.03.02] Aditivo de alteração de locatário
+                [02.03.03.02.01] Visualizar
+                [02.03.03.02.02] Inserir
+                [02.03.03.02.03] Excluir
+                [02.03.03.02.04] Editar
+                [02.03.03.02.05] Efetivar aditivo
+                [02.03.03.02.06] Desfazer aditivo
+            [02.03.03.03] Inserir
+            [02.03.03.04] Excluir
+            [02.03.03.05] Editar
+            [02.03.03.06] Aditivo de alteração das regras de reajuste
+            [02.03.03.07] Efetivar aditivo de alteração das regras de reajuste
+            [02.03.03.08] Desfazer aditivo de alteração das regras de reajuste
+            [02.03.03.09] Aditivo de alteração dos imóveis do Contrato
+            [02.03.03.10] Efetivar aditivo de alteração dos imóveis do Contrato
+            [02.03.03.11] Desfazer aditivo de alteração dos imóveis do Contrato
+            [02.03.03.12] Aditivo de Renovação
+            [02.03.03.13] Efetivar aditivo de alteração de vigência de contrato de locação
+            [02.03.03.14] Desfazer aditivo de alteração de vigência de contrato de locação
+            [02.03.03.15] Aditivo de alteração da regra de vencimento
+            [02.03.03.16] Efetivar aditivo de alteração da regra de vencimento
+            [02.03.03.17] Desfazer aditivo de alteração da regra de vencimento
+            [02.03.03.18] Aditivo de exclusão de imóvel
+            [02.03.03.19] Efetivar aditivo de exclusão de imóvel
+            [02.03.03.20] Desfazer aditivo de exclusão de imóvel
+            [02.03.03.21] Aditivo de alteração aluguel em dobro
+            [02.03.03.22] Efetivar aditivo de alteração aluguel em dobro
+            [02.03.03.23] Desfazer aditivo de alteração aluguel em dobro
+            [02.03.03.24] Aditivo de alteração de parâmetros do Aluguel Complementar
+            [02.03.03.25] Efetivar aditivo de alteração de parâmetros do Aluguel Complementar
+            [02.03.03.26] Desfazer aditivo de alteração de parâmetros do Aluguel Complementar
+            [02.03.03.27] Aditivo de renegociação de dívida
+            [02.03.03.28] Efetivar aditivo de renegociação de dívida
+            [02.03.03.29] Desfazer aditivo de renegociação de dívida
+        [02.03.06] Contábil/Financeiro
+            [02.03.06.01] Estornar Lançamentos Contábeis
+            [02.03.06.02] Incluir Lançamentos Contábeis
+            [02.03.06.03] Lançamentos Contábeis do Contrato de Locação
+            [02.03.06.04] Excluir Lançamentos Contábeis
+            [02.03.06.05] Permissão para informar a data do estorno
+            [02.03.06.06] Solicitação de Tarefa Contábil
+            [02.03.06.07] Alterar data da contabilização
+            [02.03.06.08] Alterar evento contábil da contabilização
+            [02.03.06.09] Permissão para editar contabilização
+            [02.03.06.10] Incluir Lançamentos Contábeis Rescisão
+            [02.03.06.11] Excluir Lançamentos Contábeis Rescisão
+            [02.03.06.12] Estornar Lançamentos Contábeis Rescisão
+            [02.03.06.13] Lançamentos Contábeis de Rescisão
+            [02.03.06.14] Permissão para informar a data do estorno Rescisão
+            [02.03.06.15] Solicitação de Tarefa Contábil Rescisão
+            [02.03.06.16] Alterar data da contabilização Rescisão
+            [02.03.06.17] Alterar evento contábil da contabilização Rescisão
+            [02.03.06.18] Permissão para editar contabilização Rescisão
+            [02.03.06.19] Gerar Lançamento Previsão Rescisão
+        [02.03.07] Aplicar Reajuste
+        [02.03.08] Desfazer Reajuste
+        [02.03.09] Aluguel Complementar
+            [02.03.09.02] Medição de Aluguel Sob Faturamento Diário
+            [02.03.09.03] Apuração medição diária
+            [02.03.09.04] Cancelar Aluguel Complementar
+            [02.03.09.05] Medição de Aluguel Sob Faturamento
+        [02.03.10] Comissão
+            [02.03.10.01] Comissão: Incluir
+            [02.03.10.02] Comissão: Excluir
+            [02.03.10.03] Comissão: Editar
+            [02.03.10.04] Comissão: Incluir Movimento
+            [02.03.10.05] Comissão: Excluir Movimento
+
+    [02.04] Evento Financeiro
+        [02.04.01] Evento Financeiro
+            [02.04.01.01] Evento Financeiro: Incluir
+            [02.04.01.02] Evento Financeiro: Excluir
+            [02.04.01.03] Evento Financeiro: Editar
+            [02.04.01.04] Evento Financeiro: Incluir lançamento
+            [02.04.01.05] Evento Financeiro: Excluir lançamento
+            [02.04.01.06] Evento Financeiro: Cancelar lançamento
+
+    [02.05] Cadastros
+        [02.05.01] Cadastros Aluguel
+            [02.05.01.01] Condomínio
+                [02.05.01.01.01] Administrador do Condomínio: Incluir
+                [02.05.01.01.02] Administrador do Condomínio: Excluir
+                [02.05.01.01.03] Administrador do Condomínio: Editar
+            [02.05.01.02] Beneficiário
+                [02.05.01.02.01] Beneficiário: Incluir
+                [02.05.01.02.02] Beneficiário: Excluir
+                [02.05.01.02.03] Beneficiário: Editar
+            [02.05.01.03] Corretor
+                [02.05.01.03.01] Corretor: Incluir
+                [02.05.01.03.02] Corretor: Excluir
+                [02.05.01.03.03] Corretor: Editar
+            [02.05.01.04] Fiador
+                [02.05.01.04.01] Fiador: Incluir
+                [02.05.01.04.02] Fiador: Excluir
+                [02.05.01.04.03] Fiador: Editar
+            [02.05.01.05] Locatário
+                [02.05.01.05.01] Locatário: Incluir
+                [02.05.01.05.02] Locatário: Excluir
+                [02.05.01.05.03] Locatário: Editar
+            [02.05.01.06] Prestadoras de Serviço
+                [02.05.01.06.01] Prestadoras de Serviço: Incluir
+                [02.05.01.06.02] Prestadoras de Serviço: Excluir
+                [02.05.01.06.03] Prestadoras de Serviço: Editar
+            [02.05.01.07] Procurador
+                [02.05.01.07.01] Procurador: Incluir
+                [02.05.01.07.02] Procurador: Excluir
+                [02.05.01.07.03] Procurador: Editar
+            [02.05.01.08] Locador
+                [02.05.01.08.01] Locador: Incluir
+                [02.05.01.08.02] Locador: Excluir
+                [02.05.01.08.03] Locador: Editar
+            [02.05.01.09] Tipo de Despesa
+                [02.05.01.09.01] Tipo de Despesa: Incluir
+                [02.05.01.09.02] Tipo de Despesa: Excluir
+                [02.05.01.09.03] Tipo de Despesa: Editar
+            [02.05.01.10] Parâmetros de Integração Financeira para Aluguel
+                [02.05.01.10.01] Parametros de integração para aluguel: Incluir
+                [02.05.01.10.02] Parametros de integração para aluguel: Excluir
+                [02.05.01.10.03] Parametros de integração para aluguel: Editar
+            [02.05.01.11] Motivo de Aditivo
+                [02.05.01.11.01] Motivo de Aditivo: Visualizar
+                [02.05.01.11.02] Motivo de Aditivo: Incluir
+                [02.05.01.11.03] Motivo de Aditivo: Excluir
+                [02.05.01.11.04] Motivo de Aditivo: Editar
+            [02.05.01.12] Modelo de Contrato de Locação
+                [02.05.01.12.01] Modelo de Contrato de Locação: Visualizar
+                [02.05.01.12.02] Modelo de Contrato de Locação: Incluir
+                [02.05.01.12.03] Modelo de Contrato de Locação: Excluir
+                [02.05.01.12.04] Modelo de Contrato de Locação: Editar
+            [02.05.01.13] Regra de Vencimento
+                [02.05.01.13.01] Regra de Vencimento: Visualizar
+                [02.05.01.13.02] Regra de Vencimento: Incluir
+                [02.05.01.13.03] Regra de Vencimento: Excluir
+                [02.05.01.13.04] Regra de Vencimento: Editar
+            [02.05.01.14] Tipo de Contrato de Locação
+                [02.05.01.14.01] Tipo de Contrato de Locação: Visualizar
+                [02.05.01.14.02] Tipo de Contrato de Locação: Incluir
+                [02.05.01.14.03] Tipo de Contrato de Locação: Excluir
+                [02.05.01.14.04] Tipo de Contrato de Locação: Editar
+            [02.05.01.15] Tipo de Evento Financeiro
+                [02.05.01.15.01] Tipo de Evento Financeiro: Incluir
+                [02.05.01.15.02] Tipo de Evento Financeiro: Excluir
+                [02.05.01.15.03] Tipo de Evento Financeiro: Editar
+            [02.05.01.16] Tipo de Escalonamento
+                [02.05.01.16.01] Tipo de Escalonamento: Incluir
+                [02.05.01.16.02] Tipo de Escalonamento: Excluir
+                [02.05.01.16.03] Tipo de Escalonamento: Editar
+            [02.05.01.17] Tipo de Área do Imóvel
+                [02.05.01.17.01] Tipo de Área do Imóvel: Visualizar
+                [02.05.01.17.02] Tipo de Área do Imóvel: Incluir
+                [02.05.01.17.03] Tipo de Área do Imóvel: Excluir
+                [02.05.01.17.04] Tipo de Área do Imóvel: Editar
+            [02.05.01.18] Localização da Área do Imóvel
+                [02.05.01.18.01] Localização da Área do Imóvel: Visualizar
+                [02.05.01.18.02] Localização da Área do Imóvel: Incluir
+                [02.05.01.18.03] Localização da Área do Imóvel: Excluir
+                [02.05.01.18.04] Localização da Área do Imóvel: Editar
+            [02.05.01.19] Área do Imóvel
+                [02.05.01.19.01] Área do Imóvel: Visualizar
+                [02.05.01.19.02] Área do Imóvel: Incluir
+                [02.05.01.19.03] Área do Imóvel: Excluir
+                [02.05.01.19.04] Área do Imóvel: Editar
+                [02.05.01.19.05] Histórico de Locação de Área
+            [02.05.01.20] Parâmetro de Movimento Aluguel
+                [02.05.01.20.01] Parametro Movimento: Visualizar
+                [02.05.01.20.02] Parametro Movimento: Incluir
+                [02.05.01.20.03] Parametro Movimento: Excluir
+                [02.05.01.20.04] Parametro Movimento: Editar
+            [02.05.01.21] Tipo de imóvel
+                [02.05.01.21.01] Tipo de imóvel: Visualizar
+                [02.05.01.21.02] Tipo de imóvel: Incluir
+                [02.05.01.21.03] Tipo de imóvel: Excluir
+                [02.05.01.21.04] Tipo de imóvel: Editar
+            [02.05.01.22] Tabelas Dinâmicas
+                [02.05.01.22.01] Tabela Dinâmica: Visualizar
+                [02.05.01.22.02] Tabela Dinâmica: Incluir
+                [02.05.01.22.03] Tabela Dinâmica: Editar
+                [02.05.01.22.04] Tabela Dinâmica: Excluir
+            [02.05.01.23] Segmento
+                [02.05.01.23.01] Segmentos: Visualizar
+                [02.05.01.23.02] Segmentos: Incluir
+                [02.05.01.23.03] Segmentos: Excluir
+                [02.05.01.23.04] Segmentos: Editar
+        [02.05.25] Campos Complementares
+            [02.05.25.01] Comissão
+            [02.05.25.02] Contrato de Administração
+            [02.05.25.03] Contrato de Locação
+            [02.05.25.04] Imóvel
+            [02.05.25.05] Garantias
+            [02.05.25.06] Evento Financeiro
+            [02.05.25.07] Despesas
+            [02.05.25.08] Tipo de Despesa
+
+    [02.06] Controle de Despesa
+        [02.06.01] Definição de Despesa
+            [02.06.01.01] Inserir
+            [02.06.01.02] Excluir
+            [02.06.01.03] Alterar
+            [02.06.01.04] Gerar despesa
+        [02.06.02] Tipo de Despesa
+            [02.06.02.01] Inserir
+            [02.06.02.02] Excluir
+            [02.06.02.03] Editar
+        [02.06.03] Regra de Reembolso
+            [02.06.03.01] Inserir
+            [02.06.03.02] Excluir
+            [02.06.03.03] Editar
+        [02.06.04] Despesa
+            [02.06.04.01] Inserir
+            [02.06.04.02] Excluir
+            [02.06.04.03] Editar
+            [02.06.04.04] Gerar lançamento financeiro
+            [02.06.04.05] Cancelar lançamento financeiro
+            [02.06.04.06] Gerar movimento
+            [02.06.04.07] Cancelar movimento
+            [02.06.04.08] Cancelar integração
+            [02.06.04.09] Alterar vencimento e valor da parcela de despesa
+            [02.06.04.10] Regerar movimento
+
+    [02.07] Shopping
+        [02.07.01] Shopping
+            [02.07.01.01] Mapa de Cobrança
+                [02.07.01.01.01] Mapa de cobrança: Visualizar
+                [02.07.01.01.02] Mapa de cobrança: Incluir
+                [02.07.01.01.03] Mapa de cobrança: Excluir
+                [02.07.01.01.04] Mapa de cobrança: Editar
+
+            [02.07.01.02] Fundo Promocional
+                [02.07.01.02.01] Fundo promocional: Visualizar
+                [02.07.01.02.02] Fundo promocional: Incluir
+                [02.07.01.02.03] Fundo promocional: Excluir
+                [02.07.01.02.04] Fundo promocional: Editar
+                [02.07.01.02.05] Gerar Lançamento de Fundo Promocional
+                [02.07.01.02.06] Cancelar Lançamento de Fundo Promocional
+                [02.07.01.02.07] Parcelas do Fundo Promocional
+
+    [02.08] Relatórios
+        [02.08.01] Ficha Financeira
+        [02.08.02] Informe IR
+        [02.08.03] Lançamentos Mensais
+        [02.08.04] Locação
+            [02.08.04.01] Relatório - Taxa de Ocupação dos Imóveis
+            [02.08.04.02] Relatório - Eficiência Financeira da Locação
+        [02.08.07] Shopping
+            [02.08.07.01] Relatório de Vacância
+            [02.08.07.02] Inadimplência de Shopping
+            [02.08.07.03] Faturamento de Shopping
+            [02.08.07.04] Despesas do sócio empreendedor
+            [02.08.07.05] Rentabilidade do Shopping
+            [02.08.07.06] Fechamento de Contas a Receber
+            [02.08.07.07] Encerramentos e Rescisões
+            [02.08.07.08] Cobrança de Fundo Promocional
+            [02.08.07.09] Extrato do condomínio
+
+[05] Cobrança
+    [05.01] Assistente de Cobrança
+        [05.01.01] Ações de Cobrança
+            [05.01.01.01] Ações de Cobrança: Visualizar
+            [05.01.01.02] Ações de Cobrança: Incluir
+            [05.01.01.03] Ações de Cobrança: Editar
+            [05.01.01.04] Ações de Cobrança: Excluir
+            [05.01.01.05] Gerar Ação Manual de Cobrança
+        [05.01.02] Régua de Cobrança
+            [05.01.02.01] Régua de Cobrança: Visualizar
+            [05.01.02.02] Régua de Cobrança: Incluir
+            [05.01.02.03] Régua de Cobrança: Editar
+            [05.01.02.04] Régua de Cobrança: Excluir
+            [05.01.02.05] Item Régua de Cobrança: Visualizar
+            [05.01.02.06] Item Régua de Cobrança: Incluir
+            [05.01.02.07] Item Régua de Cobrança: Editar
+            [05.01.02.08] Item Régua de Cobrança: Excluir
+        [05.01.03] Carteira de Cobrança
+            [05.01.03.01] Carteira de Cobrança: Visualizar
+            [05.01.03.02] Carteira de Cobrança: Incluir
+            [05.01.03.03] Carteira de Cobrança: Editar
+            [05.01.03.04] Carteira de Cobrança: Excluir
+        [05.01.04] Visão de Cobrança
+            [05.01.04.01] Cobrança: Visualizar
+            [05.01.04.02] Cobrança Lançamentos: Visualizar
+            [05.01.04.03] Alterar a Carteira da Cobrança
+            [05.01.04.04] Gerar Ação Manual de Cobrança
+        [05.01.05] Gerar Cobrança
+        [05.01.06] Visão de Atendimentos
+
+    [05.02] Atendimento
+        [05.02.01] Tipos Atendimentos
+            [05.02.01.01] Incluir Tipos de atendimentos
+            [05.02.01.02] Excluir Tipos de atendimentos
+            [05.02.01.03] Editar Tipos de atendimentos
+            [05.02.01.04] Copiar Tipo de Atendimento
+            [05.02.01.05] Sincronizar Usuário Integração
+            [05.02.01.06] Alterar Modelo de Email
+            [05.02.01.07] Ordenar Apresentação dos Parâmetros
+            [05.02.01.08] Estatísticas Pesquisa Satisfação
+            [05.02.01.09] Validar Tipo de Atendimento
+        [05.02.02] Grupos Atendimentos
+            [05.02.02.01] Incluir Grupos de atendimentos
+            [05.02.02.02] Excluir Grupos de atendimentos
+            [05.02.02.03] Editar Grupos de atendimentos
+        [05.02.03] Pessoas
+        [05.02.04] Atendentes
+            [05.02.04.01] Incluir atendentes
+            [05.02.04.02] Excluir atendentes
+            [05.02.04.03] Editar atendentes
+            [05.02.04.04] Serviços de atendentes (Corpore.NET)
+        [05.02.05] Grupos Atendentes
+            [05.02.05.01] Incluir Grupo Atendentes
+            [05.02.05.02] Excluir Grupo Atendentes
+            [05.02.05.03] Editar Grupo Atendentes
+        [05.02.06] Hierarquias
+            [05.02.06.01] Incluir Hierarquia
+            [05.02.06.02] Excluir Hierarquia
+            [05.02.06.03] Editar Hierarquia
+            [05.02.06.04] Acertar hierarquia do atendentes
+        [05.02.07] Despertar Atendimento
+        [05.02.08] Localidades
+            [05.02.08.01] Incluir Localidade
+            [05.02.08.02] Excluir Localidade
+            [05.02.08.03] Editar Localidade
+        [05.02.09] Tipos de Atendente
+            [05.02.09.01] Incluir Tipo de Atendente
+            [05.02.09.02] Excluir Tipo de Atendente
+            [05.02.09.03] Editar Tipo de Atendente
+        [05.02.10] Período de Trabalho
+            [05.02.10.01] Incluir Período de Trabalho
+            [05.02.10.02] Excluir Período de Trabalho
+            [05.02.10.03] Editar Período de Trabalho
+        [05.02.11] Postos de Trabalho
+            [05.02.11.01] Incluir Postos de Trabalho
+            [05.02.11.02] Excluir Postos de Trabalho
+            [05.02.11.03] Editar Postos de Trabalho
+        [05.02.12] Motivos Atividade/Inatividade
+            [05.02.12.01] Incluir Motivo Atividade/Inatividade
+            [05.02.12.02] Excluir Motivo Atividade
+            [05.02.12.03] Editar Motivo Atividade
+        [05.02.13] Motivos de Repasse
+            [05.02.13.01] Incluir Motivo Repasse
+            [05.02.13.02] Excluir Motivo Repasse
+            [05.02.13.03] Editar Motivo Repasse
+        [05.02.14] Resultados do Contato
+            [05.02.14.01] Resultado do Contato: Visualizar
+            [05.02.14.02] Resultado do Contato: Incluir
+            [05.02.14.03] Resultado do Contato: Excluir
+            [05.02.14.04] Resultado do Contato: Editar
+
+[06] Atendimento
+    [06.01] Atendimento Revitalizado
+        [06.01.01] Tipo de Atendimento TCGI
+            [06.01.01.01] Tipo de Atendimento: Visualizar
+            [06.01.01.02] Tipo de Atendimento: Incluir
+            [06.01.01.03] Tipo de Atendimento: Editar
+            [06.01.01.04] Tipo de Atendimento: Excluir
+            [06.01.01.05] Tipo de Atendimento: Etapa
+        [06.01.02] Checklist
+            [06.01.02.01] Checklist: Visualizar
+            [06.01.02.02] Checklist: Incluir
+            [06.01.02.03] Checklist: Editar
+            [06.01.02.04] Checklist: Excluir
+            [06.01.02.05] Checklist: Item
+        [06.01.03] Coberturas
+            [06.01.03.01] Tipos de Cobertura - Visualizar
+            [06.01.03.02] Tipos de Cobertura - Inserir
+            [06.01.03.03] Tipos de Cobertura - Excluir
+            [06.01.03.04] Tipos de Cobertura - Editar
+            [06.01.03.05] Rateio por centro de custo - Visualizar
+            [06.01.03.06] Rateio por centro de custo - Inserir
+            [06.01.03.07] Rateio por centro de custo - Excluir
+            [06.01.03.08] Rateio por centro de custo - Editar
+        [06.01.04] Modelos
+            [06.01.04.01] Modelos - Visualizar
+            [06.01.04.02] Modelos - Inserir
+            [06.01.04.03] Modelos - Excluir
+            [06.01.04.04] Modelos - Editar
+            [06.01.04.05] Coberturas do Modelo - Visualizar
+            [06.01.04.06] Coberturas do Modelo - Inserir
+            [06.01.04.07] Coberturas do Modelo - Excluir
+            [06.01.04.08] Coberturas do Modelo - Editar
+        [06.01.05] Gerar Atendimento
+            [06.01.05.01] Atendimento: Visualizar
+            [06.01.05.02] Atendimento: Editar
+            [06.01.05.03] Atendimento: Inserir
+            [06.01.05.04] Atendimento: Excluir
+            [06.01.05.05] Atendimento CheckList: Visualizar
+            [06.01.05.06] Atendimento CheckList: Editar
+            [06.01.05.07] Atendimento Movimentos: Visualizar
+            [06.01.05.08] Atendimento Conversor: TAA → TCGI
+
+    [06.02] Atendimento
+
+[07] Outros
+    [07.01] Controle de Documento
+        [07.01.01] Classificação do documento
+            [07.01.01.01] Inserir
+            [07.01.01.02] Excluir
+            [07.01.01.03] Editar
+        [07.01.02] Documentação
+            [07.01.02.01] Inserir
+            [07.01.02.02] Excluir
+            [07.01.02.03] Editar
+            [07.01.02.04] Enviar documento para o Fluig
+
+    [07.02] Controle de Seguro
+        [07.02.01] Seguro
+            [07.02.01.01] Inserir
+            [07.02.01.02] Excluir
+            [07.02.01.03] Editar
+            [07.02.01.04] Gerar endosso
+            [07.02.01.05] Desfazer endosso
+            [07.02.01.06] Associar imóvel
+            [07.02.01.07] Associar contrato de locação
+            [07.02.01.08] Renovar seguro
+            [07.02.01.09] Efetivar seguro
+            [07.02.01.10] Reabrir seguro
+            [07.02.01.11] Encerrar seguro
+        [07.02.02] Modalidade de Seguro
+            [07.02.02.01] Inserir
+            [07.02.02.02] Excluir
+            [07.02.02.03] Editar
+        [07.02.03] Campos Complementares
+            [07.02.03.01] Seguro
+
+[08] Utilitários
+    [08.01] Ferramentas
+        [08.01.01] Diagnóstico de Integração
+        [08.01.02] Limpeza de Tabelas de Log
+        [08.01.03] Assistente de Cobrança
+        [08.01.04] Transferir Contratos de Venda do TIN
+        [08.01.05] Compilar Fórmulas TCGI
+        [08.01.06] Importador de Baixas
+            [08.01.06.01] Importador: Visualizar
+            [08.01.06.02] Importador: Inserir
+            [08.01.06.03] Importador: Editar
+            [08.01.06.04] Importador: Excluir
+            [08.01.06.05] Importador: Importar Arquivo
+            [08.01.06.06] Importador: Validador Itens de Baixa Importados
+            [08.01.06.07] Importador: Baixar os Itens
+            [08.01.06.08] Importador: Ajustar Valores Divergentes Via Aditivo Global
+        [08.01.07] Importador de Contrato de Venda
+
+    [08.02] Tarefas Venda
+        [08.02.01] Backup
+        [08.02.02] Restore
+        [08.02.03] De/Para Restore
+
+    [08.03] Portal / App
+        [08.03.01] Manutenção de usuários
+        [08.03.02] Notificações de boleto
+        [08.03.03] Notificações de comunicados
+        [08.03.04] Gestão
+
+[09] Securitização
+    [09.01] Securitização
+        [09.01.01] Contrato de Securitização - Venda
+            [09.01.01.01] Visualizar
+            [09.01.01.02] Incluir
+            [09.01.01.03] Editar
+            [09.01.01.04] Excluir
+            [09.01.01.05] Lançamentos: Visualizar
+            [09.01.01.06] Lançamentos: Incluir
+            [09.01.01.07] Lançamentos: Excluir
+            [09.01.01.08] Efetivar Contrato
+            [09.01.01.09] Voltar Situação
+            [09.01.01.10] Apuração Mensal Lançamentos em Atraso
+            [09.01.01.11] Recompra de Lançamentos
+            [09.01.01.12] Lançamentos de repasse
+            [09.01.01.13] Contabilização
+            [09.01.01.14] Devolução do Valor Pago
+            [09.01.01.15] Desfazer Recompras/Devoluções
+            [09.01.01.16] Alteração Global do Contrato
+        [09.01.02] Campos Complementares
+        [09.01.03] Parâmetros de Integração Financeira
+            [09.01.03.01] Inserir
+            [09.01.03.02] Editar
+            [09.01.03.03] Excluir
+
+[10] Customização
+
+[11] by Worknow
+    [11.01] Automação
+        [11.01.01] WorkChat
+            [11.01.01.01] Controle de Envios
+                [11.01.01.01.01] Inserir registro
+                [11.01.01.01.02] Excluir registro
+                [11.01.01.01.03] Editar registro
+            [11.01.01.02] Processamento de Envios
+            [11.01.01.03] Executar Integração WorkChat
+                [11.01.01.03.01] Inserir registro
+                [11.01.01.03.02] Excluir registro
+                [11.01.01.03.03] Editar registro
+            [11.01.01.04] Categoria de Envios
+                [11.01.01.04.01] Inserir registro
+                [11.01.01.04.02] Excluir registro
+                [11.01.01.04.03] Editar registro
+            [11.01.01.05] Cadastro de Envios
+                [11.01.01.05.01] Inserir registro
+                [11.01.01.05.02] Excluir registro
+                [11.01.01.05.03] Editar registro
+            [11.01.01.06] Log de Integração
+                [11.01.01.06.01] Inserir registro
+                [11.01.01.06.02] Excluir registro
+                [11.01.01.06.03] Editar registro
+            [11.01.01.07] Parâmetros WorkChat: Inserir
+            [11.01.01.08] Parâmetros WorkChat: Excluir
+            [11.01.01.09] Parâmetros WorkChat: Editar
+
+[12] Gestão
+    [12.01] Utilitários
+        [12.01.01] Calculadora
+        [12.01.02] Agenda
+            [12.01.02.01] Inserir compromisso
+            [12.01.02.02] Remover compromisso
+            [12.01.02.03] Editar compromisso
+        [12.01.03] TOTVS Compartilhamento
+
+    [12.02] Ferramentas de Análise
+        [12.02.01] Cubo
+            [12.02.01.01] Cadastro de Cubos
+                [12.02.01.01.01] Inserir Cubo
+                [12.02.01.01.02] Excluir Cubo
+                [12.02.01.01.03] Editar Cubo
+            [12.02.01.02] Excluir Cubo
+            [12.02.01.03] Alterar Cubo
+            [12.02.01.04] Visualizar Cubo
+            [12.02.01.05] Atualizar Cubo
+            [12.02.01.06] Exportar para CUBX
+            [12.02.01.07] Exportar para XLS/PDF/RTF
+            [12.02.01.08] Imprimir Cubo
+            [12.02.01.09] Salvar Gráfico
+        [12.02.03] Planilha Net
+            [12.02.03.01] Incluir Planilha
+            [12.02.03.02] Excluir Planilha
+            [12.02.03.03] Editar Planilha
+            [12.02.03.04] Configurar recálculo automático
+            [12.02.03.05] Habilitar botão Salvar
+            [12.02.03.06] Habilitar botão “Salvar como Excel”
+            [12.02.03.07] Converter Excel para RM
+            [12.02.03.08] Reexecutar consulta SQL da célula
+            [12.02.03.09] Visualizar consulta SQL
+            [12.02.03.10] Associar consulta SQL
+            [12.02.03.11] Desassociar consulta SQL
+            [12.02.03.12] Ordem de execução das consultas
+            [12.02.03.13] Reexecutar consultas de todas as planilhas
+            [12.02.03.14] Reexecutar consultas da planilha atual
+            [12.02.03.15] Recalcular automaticamente
+            [12.02.03.16] Associar variável a célula
+            [12.02.03.17] Adicionar gráfico
+            [12.02.03.18] Remover gráfico
+            [12.02.03.19] Editar gráfico
+        [12.02.04] Fórmula Visual
+            [12.02.04.01] Atividades
+                [12.02.04.01.01] Incluir
+                [12.02.04.01.02] Excluir
+                [12.02.04.01.03] Editar
+            [12.02.04.02] Categorias
+                [12.02.04.02.01] Incluir
+                [12.02.04.02.02] Excluir
+                [12.02.04.02.03] Editar
+            [12.02.04.03] Fórmula Visual
+                [12.02.04.03.01] Incluir
+                [12.02.04.03.02] Excluir
+                [12.02.04.03.03] Editar
+                [12.02.04.03.04] Executar
+        [12.02.08] Smart View
+            [12.02.08.01] Inserir Recurso
+            [12.02.08.02] Excluir Recurso
+            [12.02.08.03] Editar Recurso
+            [12.02.08.04] Processos
+                [12.02.08.04.01] Importar Recurso
+                [12.02.08.04.02] Exportar Recurso
+        [12.02.10] RM Reports
+            [12.02.10.01] Inserir relatório
+            [12.02.10.02] Excluir relatório
+            [12.02.10.03] Editar relatório
+            [12.02.10.04] Processos
+                [12.02.10.04.01] Copiar Relatórios
+                [12.02.10.04.02] Editar Estrutura
+                [12.02.10.04.03] Importar Relatórios
+                [12.02.10.04.04] Exportar Relatórios
+                [12.02.10.04.05] Gerar Relatórios
+        [12.02.11] Visões de Dados
+            [12.02.11.01] Incluir Consultas SQL
+            [12.02.11.02] Excluir Consultas SQL
+            [12.02.11.03] Editar Consultas SQL
+        [12.02.12] Painéis de Cenários
+            [12.02.12.01] Inserir RMPart
+            [12.02.12.02] Renomear Guia
+            [12.02.12.03] Deletar Guia
+            [12.02.12.04] Exportar Cenário
+            [12.02.12.05] Importar Cenário
+            [12.02.12.06] Alterar Parâmetros
+        [12.02.13] Gerador de Saída
+            [12.02.13.01] Executar
+            [12.02.13.02] Incluir Layout
+            [12.02.13.03] Excluir Layout
+            [12.02.13.04] Alterar Layout
+            [12.02.13.05] Importar Layout
+            [12.02.13.06] Exportar Layout
+
+    [12.03] Gráficos
+        [12.03.01] Gráfico
+            [12.03.01.01] Incluir Gráficos
+            [12.03.01.02] Excluir Gráficos
+            [12.03.01.03] Editar Gráficos
+            [12.03.01.04] Visualizar Gráficos
+        [12.03.02] Categorias
+            [12.03.02.01] Incluir Categorias
+            [12.03.02.02] Excluir Categorias
+            [12.03.02.03] Editar Categorias
+        [12.03.03] Fontes de Gráficos
+
+    [12.04] RSS
+        [12.04.01] Leitor RSS
+            [12.04.01.01] Receber e-mails de novos feeds
+        [12.04.02] Iniciar Serviço
+        [12.04.03] Configuração
+        [12.04.04] Canais RSS
+            [12.04.04.01] Incluir Canal RSS
+            [12.04.04.02] Excluir Canal RSS
+            [12.04.04.03] Editar Canal RSS
+        [12.04.05] Meus Canais
+
+    [12.05] RM Conector
+        [12.05.01] RM Conector
+            [12.05.01.01] Exportação
+            [12.05.01.02] Importação
+            [12.05.01.03] Gerenciamento
+
+    [12.06] Comunicação
+        [12.06.01] Aplicativos Externos
+            [12.06.01.01] Inserir aplicativo externo
+            [12.06.01.02] Remover aplicativo externo
+            [12.06.01.03] Editar aplicativo externo
+            [12.06.01.04] Customizar Aplicativo Externo
+            [12.06.01.05] Gerenciamento de Correspondências
+        [12.06.02] Aplicativos SAML
+            [12.06.02.01] Inserir aplicativos SAML
+            [12.06.02.02] Remover aplicativos SAML
+            [12.06.02.03] Editar aplicativos SAML
+
+[13] Ambiente
+    [13.01] Processos
+        [13.01.01] Gerenciamento de Jobs
+            [13.01.01.01] Iniciar Servidor
+            [13.01.01.02] Interromper Servidor
+            [13.01.01.03] Finalizar Servidor
+            [13.01.01.04] Interromper Job
+            [13.01.01.05] Ativar Job
+            [13.01.01.06] Desativar Job
+            [13.01.01.07] Consultar Jobs emitidos de todos os Usuários
+            [13.01.01.08] Excluir Job
+        [13.01.02] Relatórios Gerados
+            [13.01.02.01] Exclusão em bloco de relatórios gerados
+        [13.01.03] Cockpit
+        [13.01.04] Segurança de Jobs Fracionáveis
+            [13.01.04.01] Incluir Jobs Fracionáveis
+            [13.01.04.02] Excluir Jobs Fracionáveis
+            [13.01.04.03] Editar Jobs Fracionáveis
+
+    [13.02] Configuração
+        [13.02.01] Diagnóstico do Sistema
+            [13.02.01.01] Gerar Diagnóstico
+        [13.02.02] Deploy Granular
+        [13.02.03] Parâmetros
+            [13.02.03.01] Gestão de Imóveis
+            [13.02.03.02] Parâmetros Globais
+            [13.02.03.03] Integrações entre sistemas
+                [13.02.03.03.01] Incluir Integrações
+                [13.02.03.03.02] Excluir Integrações
+                [13.02.03.03.03] Editar Integrações
+
+    [13.03] TOTVS Fluig
+
+    [13.04] Ajuda
+        [13.04.01] Sobre
+        [13.04.02] Links
+
+[14] Permissões Globais
+    [14.01] Filtros
+        [14.01.01] Filtros Globais
+        [14.01.02] Filtros Relatórios
+    [14.02] Processos
+        [14.02.01] Reportar para TOTVS
+
+[15] Gestão de Imóveis (Portal)
+    [15.01] Administrador
+        [15.01.01] Andamento da obra
+            [15.01.01.01] Andamento da Obra
+                [15.01.01.01.01] Visualizar
+                [15.01.01.01.02] Incluir
+                [15.01.01.01.03] Excluir
+                [15.01.01.01.04] Editar
+                [15.01.01.01.05] Calcular Avanço
+                [15.01.01.01.06] Gerar Medições MCMV
+        [15.01.03] Comunicados
+        [15.01.04] Fale conosco
+        [15.01.05] Dados cadastrais
+        [15.01.06] Galeria de fotos
+        [15.01.07] Personalizar
+
+    [15.02] Cliente
+        [15.02.01] Andamento da obra
+        [15.02.02] Comunicados
+        [15.02.03] Fale conosco
+        [15.02.04] Dados cadastrais
+        [15.02.05] Galeria de fotos
+        [15.02.06] Boletos (Situação Financeira)
+        [15.02.07] Boleto (2ª via)
+        [15.02.08] Relatórios
+            [15.02.08.01] Ficha Financeira
+            [15.02.08.02] Informe IR
+            [15.02.08.03] Relatórios WEB
+        [15.02.09] Documentos
+        [15.02.10] Renegociação de Contrato
+        [15.02.11] Configurar App
+        [15.02.12] Atendimento
+            [15.02.12.01] Visualizar
+            [15.02.12.02] Editar
+            [15.02.12.03] Inserir
+            [15.02.12.04] Excluir
+            [15.02.12.05] CheckList: Visualizar
+            [15.02.12.06] CheckList: Editar
+            [15.02.12.07] Movimentos: Visualizar
+            [15.02.12.08] Conversor TAA → TCGI
+
+    [15.03] Web Services
+        [15.03.01] Acesso Irrestrito aos Dados
+  </script>
+
+  <script>
+    function construirArvoreMenus() {
+      const raw = document.getElementById('raw-menus').textContent.split('\n');
+      const treeContainer = document.getElementById('tree');
+      const rootUl = document.createElement('ul');
+      treeContainer.appendChild(rootUl);
+
+      const stack = [{ indent: -1, ul: rootUl }];
+
+      raw.forEach(line => {
+        if (!line.trim()) return;
+        const indent = line.match(/^\s*/)[0].length;
+        const text = line.trim();
+
+        while (indent <= stack[stack.length - 1].indent) stack.pop();
+        const parentUl = stack[stack.length - 1].ul;
+
+        const li = document.createElement('li');
+
+        const arrow = document.createElement('span');
+        arrow.className = "toggle-arrow";
+        arrow.innerHTML = `
+          <svg class="arrow-icon" viewBox="0 0 24 24">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+        `;
+
+        const label = document.createElement('label');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = "menu-checkbox";
+        label.appendChild(cb);
+        label.appendChild(document.createTextNode(" " + text));
+
+        const linha = document.createElement('div');
+        linha.className = "tree-line";
+        linha.appendChild(arrow);
+        linha.appendChild(label);
+
+        li.appendChild(linha);
+        parentUl.appendChild(li);
+
+        const childUl = document.createElement('ul');
+        li.appendChild(childUl);
+
+        stack.push({ indent, ul: childUl });
+      });
+
+      document.querySelectorAll('#tree li').forEach(li => {
+        const childUl = li.querySelector(':scope > ul');
+        if (!childUl || childUl.children.length === 0) {
+          li.querySelector('.toggle-arrow').remove();
+        } else {
+          li.classList.add('collapsed');
+        }
+      });
+
+      ativarSetinhas();
+      ativarPropagacao();
+    }
+
+    function ativarSetinhas() {
+      document.querySelectorAll('.toggle-arrow').forEach(arrow => {
+        arrow.addEventListener('click', () => {
+          const li = arrow.closest('li');
+          const icon = arrow.querySelector('.arrow-icon');
+
+          if (li.classList.contains('collapsed')) {
+            li.classList.remove('collapsed');
+            icon.style.transform = "rotate(90deg)";
+          } else {
+            li.classList.add('collapsed');
+            icon.style.transform = "rotate(0deg)";
+          }
+        });
+      });
+    }
+
+    function ativarPropagacao() {
+      document.getElementById('tree').addEventListener('change', (e) => {
+        if (!e.target.classList.contains('menu-checkbox')) return;
+
+        const li = e.target.closest('li');
+        li.querySelectorAll('ul .menu-checkbox').forEach(cb => cb.checked = e.target.checked);
+      });
+    }
+
+    function marcarTodos(v) {
+      document.querySelectorAll('.menu-checkbox').forEach(cb => cb.checked = v);
+    }
+
+    function expandirTodos(v) {
+      document.querySelectorAll('#tree li').forEach(li => {
+        const icon = li.querySelector('.arrow-icon');
+        const hasChildren = li.querySelector(':scope > ul')?.children.length;
+
+        if (!hasChildren) return;
+
+        if (v) {
+          li.classList.remove('collapsed');
+          icon.style.transform = "rotate(90deg)";
+        } else {
+          li.classList.add('collapsed');
+          icon.style.transform = "rotate(0deg)";
+        }
+      });
+    }
+
+
+function exportarHTML() {
+  const container = document.querySelector(".card").cloneNode(true);
+
+  container.querySelectorAll(".btn-pill, .btn-primary, .btn-secondary")
+           .forEach(btn => btn.remove());
+
+  container.querySelectorAll("ul").forEach(ul => ul.style.display = "block");
+  container.querySelectorAll(".arrow-icon").forEach(icon => {
+    icon.style.transform = "rotate(90deg)";
+  });
+
+  container.querySelectorAll("li").forEach(li => {
+    const ul = li.querySelector(':scope > ul');
+    if (ul && ul.children.length > 0) {
+      li.classList.add('collapsed-export'); 
+    }
+  });
+
+  container.querySelectorAll(".menu-checkbox").forEach(cb => {
+    if (cb.checked) cb.setAttribute("checked", "checked");
+    cb.setAttribute("disabled", "disabled");
+  });
+
+
+  const perfil = localStorage.getItem("perfilEscolhido") || "Não informado";
+
+  let htmlFinal = "";
+  htmlFinal += "<!DOCTYPE html>";
+  htmlFinal += "<html lang='pt-BR'>";
+  htmlFinal += "<head>";
+  htmlFinal += "<meta charset='UTF-8'>";
+  htmlFinal += "<title>Permissões Exportadas</title>";
+  htmlFinal += "<style>";
+  htmlFinal += "body{font-family:system-ui,Arial;background:#f3f4f6;padding:20px;}";
+  htmlFinal += ".card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:20px;max-width:900px;margin:auto;}";
+  htmlFinal += ".tree-line{display:flex;align-items:center;gap:6px;margin:4px 0;}";
+  htmlFinal += ".menu-checkbox{width:14px;height:14px;border:1px solid #666;border-radius:3px;}";
+  htmlFinal += ".menu-checkbox:checked{background:#0C6C94;border-color:#0C6C94;}";
+  htmlFinal += "ul{margin-left:20px;list-style:none;}";
+  htmlFinal += ".toggle-arrow{cursor:pointer;}";
+  htmlFinal += ".arrow-icon{width:12px;transition:0.2s;}";
+  htmlFinal += ".collapsed-export > ul { display: none; }"; 
+  htmlFinal += "</style>";
+  htmlFinal += "</head>";
+  htmlFinal += "<body>";
+
+  htmlFinal += "<h2 style='text-align:center;color:#0C6C94;'>Permissões exportadas</h2>";
+
+
+  htmlFinal += `<h3 style='text-align:center;margin:10px 0 25px;color:#333;'>Perfil configurado: <strong>${perfil}</strong></h3>`;
+
+
+  htmlFinal += container.innerHTML;
+
+  htmlFinal += "<script>";
+  htmlFinal += "document.querySelectorAll('.toggle-arrow').forEach(function(arrow){";
+  htmlFinal += "  arrow.addEventListener('click', function(){";
+  htmlFinal += "    var li = arrow.closest('li');";
+  htmlFinal += "    var ul = li.querySelector(':scope > ul');";
+  htmlFinal += "    var icon = arrow.querySelector('.arrow-icon');";
+  htmlFinal += "    if(!ul) return;";
+  htmlFinal += "    if(li.classList.contains('collapsed-export')){";
+  htmlFinal += "      li.classList.remove('collapsed-export');";
+  htmlFinal += "      icon.style.transform = 'rotate(90deg)';";
+  htmlFinal += "    } else {";
+  htmlFinal += "      li.classList.add('collapsed-export');";
+  htmlFinal += "      icon.style.transform = 'rotate(0deg)';";
+  htmlFinal += "    }";
+  htmlFinal += "  });";
+  htmlFinal += "});";
+  htmlFinal += "<\\/script>";
+
+  htmlFinal += "</body></html>";
+
+  const blob = new Blob([htmlFinal], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "permissoes_exportadas.html";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+    document.addEventListener('DOMContentLoaded', construirArvoreMenus);
+  </script>
+
+</body>
+</html>

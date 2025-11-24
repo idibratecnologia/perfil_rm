@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Escolha o Perfil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      background: #f3f4f6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #1f2937;
+    }
+
+
+    .top-bar {
+      background: #0C6C94;
+      color: #fff;
+      width: 100%;
+      padding: 18px 20px;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+
+    .page-wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 16px;
+    }
+
+
+    .card {
+      background: #fff;
+      padding: 40px;
+      border-radius: 18px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border: 1px solid #e5e7eb;
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+      color: #111827;
+    }
+
+    .description {
+      font-size: 0.9rem;
+      color: #4b5563;
+      text-align: left;
+      line-height: 1.45;
+      margin-bottom: 28px;
+    }
+
+    .profiles-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Botões */
+    .profile-button {
+      background: #0C6C94;
+      color: #fff;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 16px 18px;
+      min-height: 58px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      text-align: center;
+      transition: 0.18s;
+      box-shadow: 0 2px 6px rgba(12,108,148,0.25);
+      cursor: pointer;
+    }
+
+    .profile-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 14px rgba(12,108,148,0.35);
+      background: #0a5875;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 28px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top-bar">Escolha o Perfil</div>
+
+  <main class="page-wrapper">
+
+    <section class="card">
+
+      <div class="card-title">Selecione qual perfil deseja configurar</div>
+
+      <p class="description">
+        Após escolher o perfil, será apresentada a lista completa de menus do módulo selecionado.
+        Marque os menus que esse perfil poderá acessar.
+      </p>
+
+      <div class="profiles-list">
+
+        <a class="profile-button" onclick="selecionarPerfil('Supervisor')">Supervisor</a>
+
+        <a class="profile-button" onclick="selecionarPerfil('Analista Técnico')">Analista Técnico</a>
+
+        <a class="profile-button" onclick="selecionarPerfil('Assistente Técnico')">Assistente Técnico</a>
+
+        <a class="profile-button" onclick="selecionarPerfil('Estagiário')">Estagiário</a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    function selecionarPerfil(nomePerfil) {
+      localStorage.setItem("perfilEscolhido", nomePerfil);
+      window.location.href = "menus_gestao_imoveis.html";  // coloque o nome da sua página
+    }
+  </script>
+
+</body>
+</html>
